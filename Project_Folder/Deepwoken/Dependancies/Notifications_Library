@@ -1,0 +1,7 @@
+local Notifications = { }
+
+function Notifications:SendNotification(Title, Text, Duration)
+   return { }
+end
+
+return Notifications

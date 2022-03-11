@@ -240,7 +240,7 @@ local CheckTool = function(Object, PlayerName)
                 local Data = CreateHook(Enchant_String, Enchant_Tool, Player_Name, SoulBound)
                 
                 SendHook(Data)
-                Notifications_Library:SendNotification("Enchant Notifier", Template_String(Enchant_String, Enchant_Tool, SoulBound, PlayerName), UDim2.new(.5, -650, .5, 0), 9061754547)
+                Notifications_Library:SendNotification("Enchant Notifier", Template_String(Enchant_String, Enchant_Tool, SoulBound, Player_Name), UDim2.new(.5, -650, .5, 0), 9061754547)
             end
             
             if WeaponData.SoulBound then
@@ -252,7 +252,7 @@ local CheckTool = function(Object, PlayerName)
           
       
                 SendHook(Data)
-                Notification_Library:SendNotification("Enchant Notifier", Template_String(Enchant_String, Enchant_Tool, SoulBound, PlayerName), UDim2.new(.5, -650, .5, 0), 8904888220)
+                Notification_Library:SendNotification("Enchant Notifier", Template_String(Enchant_String, Enchant_Tool, SoulBound, Player_Name), UDim2.new(.5, -650, .5, 0), 8904888220)
             end
             
             return

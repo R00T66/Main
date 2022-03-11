@@ -206,7 +206,7 @@ Notification_Library:SendNotification(
  "Enchant Notifier", 
  "SUCCESSFULLY LOADED [" .. Game .. "]", 
  UDim2.new(.5, -650, .5, 0), 
- 6670771770
+ 0
 )
 
 local Blacklist = {1}

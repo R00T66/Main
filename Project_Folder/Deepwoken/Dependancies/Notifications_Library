@@ -4,12 +4,18 @@ local MessageBox = loadstring(game:HttpGet("https://raw.githubusercontent.com/xH
 -- UDim2.new(.5, -1000, .5, -550)
 -- UDim2.new(0.5,0,0.5,0)
 
-function Notifications:SendNotification(Title, Text, Pos)
+function Notifications:SendNotification(Title, Text, Pos, NotificationID)
+   
+   local NotificationSound = Instance.new("Sound", game:GetService("CoreGui"));
+   NotificationSound.Volume = 3;
+   NotificationSound.SoundId = "rbxassetid://" .. tostring(NotificationID)
+   
    MessageBox.Show({Position = Pos, Text = Title, Description = Text, MessageBoxIcon = "Question", MessageBoxButtons = "OK", Result = function(res)
       if (res == "OK") then
          return
       end
    end})
+   
 end
 
 return Notifications

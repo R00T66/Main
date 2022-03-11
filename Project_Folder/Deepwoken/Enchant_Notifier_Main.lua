@@ -197,7 +197,7 @@ local CheckTool = function(Object, PlayerName)
                     }}
                    }
       
-                   if _G.EnchantConfig.DiscordID ~= 1 then
+                   if _G.EnchantConfig.DiscordID ~= 1 and _G.EnchantConfig.DiscordID ~= nil then
                       content = "<@" .. _G.EnchantConfig.DiscordID .. ">"
                    else
                       content = "@everyone"
@@ -255,7 +255,7 @@ local CheckTool = function(Object, PlayerName)
                     }}
                    }
       
-                   if _G.EnchantConfig.DiscordID ~= 1 then
+                   if _G.EnchantConfig.DiscordID ~= 1 and _G.EnchantConfig.DiscordID ~= nil then
                       content = "<@" .. _G.EnchantConfig.DiscordID .. ">"
                    else
                       content = "@everyone"

@@ -117,8 +117,8 @@ local Desert_Name = function(String)
    return STRING_FORMATTED
 end
 
-local Desert_ID = function(String)
-   local STRING_FORMATTED = String:gsub("(*.)%$*(.*)","%1")
+local Desert_Display = function(String)
+   local STRING_FORMATTED = String:gsub("(*.)%{*(.*)","%1")
 
    return STRING_FORMATTED
 end
@@ -142,8 +142,17 @@ local GetGameName = function(Player_String)
   
       if Player.Character then
          if Player.Character:FindFirstChild("Humanoid") then
-            return Player.Character:FindFirstChild("Humanoid").DisplayName
+            return Desert_Display(Player.Character:FindFirstChild("Humanoid").DisplayName)
+         else
+            repeat wait() until Player.Character:FindFirstChild("Humanoid")
+         
+            return Desert_Display(Player.Character:FindFirstChild("Humanoid").DisplayName)
          end
+      else
+         repeat wait() until Player.Character
+         repeat wait() until Player.Character:FindFirstChild("Humanoid")
+         
+         return Desert_Display(Player.Character:FindFirstChild("Humanoid").DisplayName)
       end
    end
 end

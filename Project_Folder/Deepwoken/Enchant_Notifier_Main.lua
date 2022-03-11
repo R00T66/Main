@@ -234,7 +234,7 @@ local CheckTool = function(Object, PlayerName)
             if not WeaponData.SoulBound then
  
                 local Enchant_String = tostring(WeaponData.Enchant)
-                local Enchant_Tool = tostring(Desert_Name(Object.Name) .. " ( " .. string.split(Object.Name, "$")[2] .. ")")
+                local Enchant_Tool = tostring(Desert_Name(Object.Name) .. " ( $" .. string.split(Object.Name, "$")[2] .. " )")
                 local Player_Name = PlayerName .. " [ " .. GetGameName(PlayerName) .. " ]"
                 local SoulBound = tostring(false)
                 local Data = CreateHook(Enchant_String, Enchant_Tool, Player_Name, SoulBound)

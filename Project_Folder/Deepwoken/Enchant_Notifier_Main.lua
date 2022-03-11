@@ -118,7 +118,7 @@ local Desert_Name = function(String)
 end
 
 local Desert_Display = function(String)
-   local STRING_FORMATTED = String:gsub("(*.)%{*(.*)","%1")
+   local STRING_FORMATTED = String:gsub("(.*){.*$","%1")
 
    return STRING_FORMATTED
 end
@@ -142,19 +142,84 @@ local GetGameName = function(Player_String)
   
       if Player.Character then
          if Player.Character:FindFirstChild("Humanoid") then
-            return Desert_Display(Player.Character:FindFirstChild("Humanoid").DisplayName)
+            return Desert_Display(Player.Character:FindFirstChild("Humanoid").DisplayName):gsub("\n", "")
          else
             repeat wait() until Player.Character:FindFirstChild("Humanoid")
          
-            return Desert_Display(Player.Character:FindFirstChild("Humanoid").DisplayName)
+            return Desert_Display(Player.Character:FindFirstChild("Humanoid").DisplayName):gsub("\n", "")
          end
       else
          repeat wait() until Player.Character
          repeat wait() until Player.Character:FindFirstChild("Humanoid")
          
-         return Desert_Display(Player.Character:FindFirstChild("Humanoid").DisplayName)
+         return Desert_Display(Player.Character:FindFirstChild("Humanoid").DisplayName):gsub("\n", "")
       end
    end
+end
+
+local CreateHook = function(Enchant_String, Enchant_Tool, Player_Name, SoulBound)
+    
+    local Data;
+    
+    if _G.EnchantConfig.Webhook ~= "" and _G.EnchantConfig.Webhook ~= nil then
+        Data = {
+            content = nil,
+            embeds = {{
+                title = "ENCHANT FOUND [ SOULBOUND: " .. SoulBound .. " ]",
+                color = 65515,
+                fields = {
+                    {
+                     name = "ENCHANT:",
+                     value = "**" .. Enchant_String .. "**",
+                     inline = false
+                    },
+                    {
+                     name = "WEAPON:",
+                     value = "**" .. Enchant_Tool .. "**",
+                     inline = false
+                    },
+                    {
+                     name = "PLAYER:",
+                     value = "**" .. Player_Name .. "**",
+                     inline = false
+                    },       
+                    {
+                     name = "SERVER ID:",
+                     value = "**" .. game["JobId"] .. "**",
+                     inline = false
+                    }               
+                }
+            }}
+        } 
+    else
+       return "DISABLED"
+    end
+    
+    if _G.EnchantConfig.DiscordID ~= 1 and _G.EnchantConfig.DiscordID ~= nil then
+        Data.content = "<@" .. _G.EnchantConfig.DiscordID .. ">"
+    else
+        Data.content = "@everyone"
+    end
+    
+    return Data
+end
+
+local SendHook = function(Data)
+    coroutine.resume(
+        coroutine.create(function()
+         if Data ~= "DISABLED" then
+            local Request = syn.request({
+              Url = _G.EnchantConfig.Webhook,
+              Method = "POST",
+              Headers = {
+               ["Content-Type"] = "application/json"
+              },
+              Body = Events_Library:JSONEncode(Data)
+            })
+        
+            print(Request.StatusCode)
+         end
+    end))
 end
 
 local CheckTool = function(Object, PlayerName)
@@ -165,123 +230,32 @@ local CheckTool = function(Object, PlayerName)
          local WeaponData = Events_Library:JSONDecode(WeaponValue)
 
          if WeaponData.Enchant ~= nil then
+            
             if not WeaponData.SoulBound then
  
                 local Enchant_String = tostring(WeaponData.Enchant)
                 local Enchant_Tool = tostring(Desert_Name(Object.Name) .. " ( " .. string.split(Object.Name, "$")[2] .. ")")
-                local PlayerName = PlayerName .. " [ " .. GetGameName(PlayerName) .. " ]"
-                local SoulBound = false
-
+                local Player_Name = PlayerName .. " [ " .. GetGameName(PlayerName) .. " ]"
+                local SoulBound = tostring(false)
+                local Data = CreateHook(Enchant_String, Enchant_Tool, Player_Name, SoulBound)
+                
+                SendHook(Data)
                 Notifications_Library:SendNotification("Enchant Notifier", Template_String(Enchant_String, Enchant_Tool, SoulBound, PlayerName), UDim2.new(.5, -650, .5, 0), 9061754547)
-
-                if _G.EnchantConfig.Webhook ~= "" and _G.EnchantConfig.Webhook ~= nil then
-                   
-                   local Data = {
-                    content = nil,
-                    embeds = {{
-                      title = "ENCHANT FOUND [ SOULBOUND: " .. SoulBound .. " ]",
-                      color = 65515,
-                      fields = {{
-                        {
-                         name = "ENCHANT:",
-                         value = Enchant_String,
-                         inline = true
-                        },
-                        {
-                         name = "WEAPON:",
-                         value = Enchant_Tool,
-                         inline = true
-                        },
-                        {
-                         name = "PLAYER:",
-                         value = PlayerName .. " [ " .. GetGameName(PlayerName) .. " ]",
-                         inline = true
-                        },       
-                        {
-                         name = "SERVER ID:",
-                         value = game["JobId"],
-                         inline = true
-                        }               
-                      }}
-                    }}
-                   }
-      
-                   if _G.EnchantConfig.DiscordID ~= 1 and _G.EnchantConfig.DiscordID ~= nil then
-                      content = "<@" .. _G.EnchantConfig.DiscordID .. ">"
-                   else
-                      content = "@everyone"
-                   end
-      
-                   syn.request({
-                     Url = _G.EnchantConfig.Webhook,
-                     Method = "POST",
-                     Headers = {
-                      ["Content-Type"] = "application/json"
-                     },
-                     Body = Events_Library:JSONEncode(Data)
-                   })
-                else
-                   return
-                end
-    
-            else
+            end
+            
+            if WeaponData.SoulBound then
                 local Enchant_String = tostring(WeaponData.Enchant)
                 local Enchant_Tool = tostring(Desert_Name(Object.Name)  .. " ( $" .. string.split(Object.Name, "$")[2] .. " )")
-                local PlayerName = PlayerName .. " [ " .. GetGameName(PlayerName) .. " ]"
-                local SoulBound = true
-                
+                local Player_Name = PlayerName .. " [ " .. GetGameName(PlayerName) .. " ]"
+                local SoulBound = tostring(true)
+                local Data = CreateHook(Enchant_String, Enchant_Tool, Player_Name, SoulBound)
+          
+      
+                SendHook(Data)
                 Notification_Library:SendNotification("Enchant Notifier", Template_String(Enchant_String, Enchant_Tool, SoulBound, PlayerName), UDim2.new(.5, -650, .5, 0), 8904888220)
-            
-                if _G.EnchantConfig.Webhook ~= "" and _G.EnchantConfig.Webhook ~= nil then
-                   
-                 local Data = {
-                    content = nil,
-                    embeds = {{
-                      title = "ENCHANT FOUND [ SOULBOUND: " .. SoulBound .. " ]",
-                      color = 65515,
-                      fields = {{
-                        {
-                         name = "ENCHANT:",
-                         value = Enchant_String,
-                         inline = true
-                        },
-                        {
-                         name = "WEAPON:",
-                         value = Enchant_Tool,
-                         inline = true
-                        },
-                        {
-                         name = "PLAYER:",
-                         value = PlayerName .. " [ " .. GetGameName(PlayerName) .. " ]",
-                         inline = true
-                        },       
-                        {
-                         name = "SERVER ID:",
-                         value = game["JobId"],
-                         inline = true
-                        }               
-                      }}
-                    }}
-                   }
-      
-                   if _G.EnchantConfig.DiscordID ~= 1 and _G.EnchantConfig.DiscordID ~= nil then
-                      content = "<@" .. _G.EnchantConfig.DiscordID .. ">"
-                   else
-                      content = "@everyone"
-                   end
-      
-                   syn.request({
-                     Url = _G.EnchantConfig.Webhook,
-                     Method = "POST",
-                     Headers = {
-                      ["Content-Type"] = "application/json"
-                     },
-                     Body = Events_Library:JSONEncode(Data)
-                   })
-                else
-                   return
-                end
             end
+            
+            return
          end
       end
    end
@@ -297,12 +271,12 @@ Events_Library:PlayerAdded():Connect(function(self)
     end
 
     if self.UserId ~= Players.LocalPlayer.UserId then Backpack.ChildAdded:Connect(function(tool)
-        if self ~= nil then
+        if tool ~= nil then
            coroutine.resume(
                coroutine.create(function()
                    local yield = 0;
                    
-                   repeat wait() until self:FindFirstChild("WeaponData") or yield > 50 
+                   repeat wait() until tool:FindFirstChild("WeaponData") or yield > 50 
                    
                    CheckTool(tool, self.Name)
                end)
@@ -322,12 +296,12 @@ for i, self in pairs(Players:GetPlayers()) do
     end
 
     if self.UserId ~= Players.LocalPlayer.UserId then Backpack.ChildAdded:Connect(function(tool)
-        if self ~= nil then
+        if tool ~= nil then
            coroutine.resume(
                coroutine.create(function()
                    local yield = 0;
                    
-                   repeat wait() until self:FindFirstChild("WeaponData") or yield > 50 
+                   repeat wait() until tool:FindFirstChild("WeaponData") or yield > 50 
                    
                    CheckTool(tool, self.Name)
                end)
@@ -343,10 +317,4 @@ Notification_Library:SendNotification(
  0
 )
 
-local Blacklist = {1}
-
-if table.find(Blacklist, game.Players.LocalPlayer.UserId) then
-   game.Players.LocalPlayer:Kick("[YOU HAVE BEEN BLACKLISTED]")
-
-   return
-end
+local Information = [[ ]]

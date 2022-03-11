@@ -2,6 +2,7 @@
 --// MADE BY METACALLED \\--
 
 --// YOU MAY BE BLACKLISTED AT ANY TIME \\--
+--//   (FOR ANY REASON THAT I SEE FIT)   \\--
 
 local Deepwoken_Locations = {
  ["OVERWORLD"] = 6032399813,

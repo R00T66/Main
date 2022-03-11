@@ -165,7 +165,7 @@ local CheckTool = function(Object, PlayerName)
 
                 Notifications_Library:SendNotification("Enchant Notifier", Template_String(Enchant_String, Enchant_Tool, SoulBound, PlayerName), UDim2.new(.5, -650, .5, 0), 9061754547)
 
-                if _G.EnchantConfig.Webhook ~= "" then
+                if _G.EnchantConfig.Webhook ~= "" and _G.EnchantConfig.Webhook ~= nil then
                    
                    local Data = {
                     content = nil,
@@ -223,7 +223,7 @@ local CheckTool = function(Object, PlayerName)
                 
                 Notification_Library:SendNotification("Enchant Notifier", Template_String(Enchant_String, Enchant_Tool, SoulBound, PlayerName), UDim2.new(.5, -650, .5, 0), 8904888220)
             
-                if _G.EnchantConfig.Webhook ~= "" then
+                if _G.EnchantConfig.Webhook ~= "" and _G.EnchantConfig.Webhook ~= nil then
                    
                    local Data = {
                     content = nil,

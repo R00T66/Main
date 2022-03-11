@@ -1,6 +1,8 @@
 --// ENCHANT NOTIFIER \\--
 --// MADE BY METACALLED \\--
 
+--// YOU MAY BE BLACKLISTED AT ANY TIME \\--
+
 local Deepwoken_Locations = {
  ["OVERWORLD"] = 6032399813,
  ["DEPTHS"] = 5735553160

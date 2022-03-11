@@ -103,6 +103,13 @@ else
    return
 end
 
+Notification_Library:SendNotification(
+ "Enchant Notifier", 
+ "SUCCESSFULLY LOADED [" .. Game .. "]", 
+ UDim2.new(.5, -650, .5, 0), 
+ 0
+)
+
 -- MAIN --
 
 local Desert_Enchant = function(String)
@@ -309,12 +316,5 @@ for i, self in pairs(Players:GetPlayers()) do
         end
     end) end
 end
-
-Notification_Library:SendNotification(
- "Enchant Notifier", 
- "SUCCESSFULLY LOADED [" .. Game .. "]", 
- UDim2.new(.5, -650, .5, 0), 
- 0
-)
 
 local Information = [[ ]]

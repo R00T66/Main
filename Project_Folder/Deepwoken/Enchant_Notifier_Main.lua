@@ -18,10 +18,19 @@ local Library_Status = {
 -- LOADING --
 
 local GameLoaded = game.IsLoaded
+local Game = " "
 
 if not GameLoaded then
    game.IsLoaded:Wait()
 end
+
+for i, PlaceID in pairs(Deepwoken_Locations) do
+   if game.PlaceId == PlaceID then
+      Game = i
+   end 
+end
+
+if Game == " " then return end
 
 -- SERVICES --
 

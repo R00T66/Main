@@ -24,8 +24,10 @@ function Notifications:SendNotification(Title, Text, Pos, NotificationID)
       end
    end})
 
-   NotificationSound.Ended:Wait()
-   NotificationSound:Destroy()
+   if NotificationSound ~= nil then
+      NotificationSound.Ended:Wait()
+      NotificationSound:Destroy()
+   end
 end
 
 return Notifications

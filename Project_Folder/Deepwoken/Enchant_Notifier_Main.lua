@@ -196,7 +196,7 @@ local CreateHook = function(Enchant_String, Enchant_Tool, Player_Name, SoulBound
     end
     
     if _G.EnchantConfig.DiscordID ~= 1 and _G.EnchantConfig.DiscordID ~= nil then
-        Data.content = "<@" .. _G.EnchantConfig.DiscordID .. ">"
+        Data.content = "<@" .. tostring(_G.EnchantConfig.DiscordID) .. ">"
     else
         Data.content = "@everyone"
     end

@@ -8,14 +8,17 @@ function Notifications:SendNotification(Title, Text, Pos, NotificationID)
    
    local NotificationSound = Instance.new("Sound", game:GetService("CoreGui"));
    NotificationSound.Volume = 3;
-   NotificationSound.SoundId = "rbxassetid://" .. tostring(NotificationID)
+   NotificationSound.SoundId = "rbxassetid://" .. tostring(NotificationID);
+   NotificationSound:Play()
    
    MessageBox.Show({Position = Pos, Text = Title, Description = Text, MessageBoxIcon = "Question", MessageBoxButtons = "OK", Result = function(res)
       if (res == "OK") then
          return
       end
    end})
-   
+
+   NotificationSound.Ended:Wait()
+   NotificationSound:Destroy()
 end
 
 return Notifications

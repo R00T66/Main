@@ -199,7 +199,7 @@ Notification_Library:SendNotification(
  "Enchant Notifier", 
  "SUCCESSFULLY LOADED!", 
  UDim2.new(.5, -650, .5, 0), 
- 8904888220
+ 6670771770
 )
 
 local Blacklist = {1}

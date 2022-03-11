@@ -4,6 +4,15 @@
 --// YOU MAY BE BLACKLISTED AT ANY TIME \\--
 --//   (FOR ANY REASON THAT I SEE FIT)   \\--
 
+if _G.EnchantConfig == nil then
+ 
+   _G.EnchantConfig = {
+    Webhook = "",
+    DiscordID = 1
+   }
+ 
+end
+
 local Deepwoken_Locations = {
  ["OVERWORLD"] = 6032399813,
  ["DEPTHS"] = 5735553160
@@ -126,6 +135,19 @@ local Template_String = function(Enchant, Tool, SoulBound, Player)
    return String
 end
 
+local GetGameName = function(Player_String)
+   if Players:FindFirstChild(Player_String) then
+     
+      local Player = Players:FindFirstChild(Player_String)
+  
+      if Player.Character then
+         if Player.Character:FindFirstChild("Humanoid") then
+            return Player.Character:FindFirstChild("Humanoid").DisplayName
+         end
+      end
+   end
+end
+
 local CheckTool = function(Object, PlayerName)
    if Object:IsA("Tool") then      
       if Object:FindFirstChild("WeaponData") then
@@ -138,15 +160,118 @@ local CheckTool = function(Object, PlayerName)
  
                 local Enchant_String = tostring(WeaponData.Enchant)
                 local Enchant_Tool = tostring(Desert_Name(Object.Name) .. " ( " .. string.split(Object.Name, "$")[2] .. ")")
+                local PlayerName = PlayerName .. " [ " .. GetGameName(PlayerName) .. " ]"
                 local SoulBound = false
 
                 Notifications_Library:SendNotification("Enchant Notifier", Template_String(Enchant_String, Enchant_Tool, SoulBound, PlayerName), UDim2.new(.5, -650, .5, 0), 9061754547)
+
+                if _G.EnchantConfig.Webhook ~= "" then
+                   
+                   local Data = {
+                    content = nil,
+                    embeds = {{
+                      title = "ENCHANT FOUND [ SOULBOUND: " .. SoulBound .. " ]",
+                      color = 65515,
+                      fields = {{
+                        {
+                         name = "ENCHANT:",
+                         value = Enchant_String,
+                         inline = true
+                        },
+                        {
+                         name = "WEAPON:"
+                         value = Enchant_Tool,
+                         inline = true
+                        },
+                        {
+                         name = "PLAYER:"
+                         value = PlayerName .. " [ " .. GetGameName(PlayerName) .. " ]",
+                         inline = true
+                        },       
+                        {
+                         name = "SERVER ID:"
+                         value = game["JobId"],
+                         inline = true
+                        },               
+                      }}
+                    }}
+                   }
+      
+                   if _G.EnchantConfig.DiscordID ~= 1 then
+                      content = "<@" .. _G.EnchantConfig.DiscordID .. ">"
+                   else
+                      content = "@everyone"
+                   end
+      
+                   syn.request({
+                     Url = _G.EnchantConfig.Webhook,
+                     Method = "POST",
+                     Headers = {
+                      ["Content-Type"] = "application/json"
+                     },
+                     Body = Events_Library:JSONEncode(Data)
+                   })
+                else
+                   return
+                end
+    
             else
                 local Enchant_String = tostring(WeaponData.Enchant)
                 local Enchant_Tool = tostring(Desert_Name(Object.Name)  .. " ( $" .. string.split(Object.Name, "$")[2] .. " )")
+                local PlayerName = PlayerName .. " [ " .. GetGameName(PlayerName) .. " ]"
                 local SoulBound = true
                 
                 Notification_Library:SendNotification("Enchant Notifier", Template_String(Enchant_String, Enchant_Tool, SoulBound, PlayerName), UDim2.new(.5, -650, .5, 0), 8904888220)
+            
+                if _G.EnchantConfig.Webhook ~= "" then
+                   
+                   local Data = {
+                    content = nil,
+                    embeds = {{
+                      title = "ENCHANT FOUND [ SOULBOUND: " .. SoulBound .. " ]",
+                      color = 65515,
+                      fields = {{
+                        {
+                         name = "ENCHANT:",
+                         value = Enchant_String,
+                         inline = true
+                        },
+                        {
+                         name = "WEAPON:"
+                         value = Enchant_Tool,
+                         inline = true
+                        },
+                        {
+                         name = "PLAYER:"
+                         value = PlayerName .. " [ " .. GetGameName(PlayerName) .. " ]",
+                         inline = true
+                        },       
+                        {
+                         name = "SERVER ID:"
+                         value = game["JobId"],
+                         inline = true
+                        },               
+                      }}
+                    }}
+                   }
+      
+                   if _G.EnchantConfig.DiscordID ~= 1 then
+                      content = "<@" .. _G.EnchantConfig.DiscordID .. ">"
+                   else
+                      content = "@everyone"
+                   end
+      
+                   syn.request({
+                     Url = _G.EnchantConfig.Webhook,
+                     Method = "POST",
+                     Headers = {
+                      ["Content-Type"] = "application/json"
+                     },
+                     Body = Events_Library:JSONEncode(Data)
+                   })
+                else
+                   return
+                end
             end
          end
       end

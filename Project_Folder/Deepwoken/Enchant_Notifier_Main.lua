@@ -146,8 +146,6 @@ local CheckTool = function(Object, PlayerName)
                 local Enchant_Tool = tostring(Desert_Name(Object.Name)  .. " ( $" .. string.split(Object.Name, "$")[2] .. " )")
                 local SoulBound = true
                 
-                print(Desert_ID(Object.Name))
-                
                 Notification_Library:SendNotification("Enchant Notifier", Template_String(Enchant_String, Enchant_Tool, SoulBound, PlayerName), UDim2.new(.5, -650, .5, 0), 8904888220)
             end
          end

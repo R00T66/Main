@@ -8,7 +8,7 @@ if _G.EnchantConfig == nil then
  
    _G.EnchantConfig = {
     Webhook = "",
-    DiscordID = 1
+    DiscordID = ""
    }
  
 end
@@ -195,7 +195,7 @@ local CreateHook = function(Enchant_String, Enchant_Tool, Player_Name, SoulBound
        return "DISABLED"
     end
     
-    if _G.EnchantConfig.DiscordID ~= 1 and _G.EnchantConfig.DiscordID ~= nil then
+    if _G.EnchantConfig.DiscordID ~= "1" and _G.EnchantConfig.DiscordID ~= 1 and _G.EnchantConfig.DiscordID ~= nil then
         Data.content = "<@" .. tostring(_G.EnchantConfig.DiscordID) .. ">"
     else
         Data.content = "@everyone"

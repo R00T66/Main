@@ -179,20 +179,20 @@ local CheckTool = function(Object, PlayerName)
                          inline = true
                         },
                         {
-                         name = "WEAPON:"
+                         name = "WEAPON:",
                          value = Enchant_Tool,
                          inline = true
                         },
                         {
-                         name = "PLAYER:"
+                         name = "PLAYER:",
                          value = PlayerName .. " [ " .. GetGameName(PlayerName) .. " ]",
                          inline = true
                         },       
                         {
-                         name = "SERVER ID:"
+                         name = "SERVER ID:",
                          value = game["JobId"],
                          inline = true
-                        },               
+                        }               
                       }}
                     }}
                    }
@@ -225,7 +225,7 @@ local CheckTool = function(Object, PlayerName)
             
                 if _G.EnchantConfig.Webhook ~= "" and _G.EnchantConfig.Webhook ~= nil then
                    
-                   local Data = {
+                 local Data = {
                     content = nil,
                     embeds = {{
                       title = "ENCHANT FOUND [ SOULBOUND: " .. SoulBound .. " ]",
@@ -237,20 +237,20 @@ local CheckTool = function(Object, PlayerName)
                          inline = true
                         },
                         {
-                         name = "WEAPON:"
+                         name = "WEAPON:",
                          value = Enchant_Tool,
                          inline = true
                         },
                         {
-                         name = "PLAYER:"
+                         name = "PLAYER:",
                          value = PlayerName .. " [ " .. GetGameName(PlayerName) .. " ]",
                          inline = true
                         },       
                         {
-                         name = "SERVER ID:"
+                         name = "SERVER ID:",
                          value = game["JobId"],
                          inline = true
-                        },               
+                        }               
                       }}
                     }}
                    }

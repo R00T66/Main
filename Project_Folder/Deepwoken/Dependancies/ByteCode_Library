@@ -1,4 +1,4 @@
---[[ CREATED BY ANONYMOUS. @NSCG ]]--
+--[[ MADE BY METACALLED ]]--
 
 local Dictionary = {};
 
@@ -101,8 +101,7 @@ Dictionary["_"] = ",**#**=(define.Underline_Symbol)"
 Dictionary[">"] = ",**#**=(define.Right_Crocco)"
 Dictionary["<"] = ",**#**=(define.Left_Crocco)"
 
-local Back = [[\]]
-Dictionary[Back] = "**#**=(define.BackSlash)"
+Dictionary["\\"] = ",**#**=(define.BackSlash)"
 
 Dictionary["Split"] = function(s, pattern, maxsplit)
   local pattern = pattern or ' '
@@ -137,7 +136,7 @@ Dictionary["Encode"] = function(String)
 
       local DicFound = false
      
-      for z, x in pairs(Dictionary) do
+      for z, x in pairs(Dictionary) do  
          if String:sub(i, i) == z then
             TemporaryDictionary[#TemporaryDictionary + 1] = x
             DicFound = true
@@ -184,11 +183,14 @@ Dictionary["Decode"] = function(EncodedString)
 end
 
 Dictionary["Writefile"] = function(filename, extension, input)
-   writefile(filename .. "." .. extension, input)
+   local file = io.open(filename.."."..extension, "w")
+  
+   file:write(input)
+   file:close()
+
+   return
 end
 
 local Encode_Function = Dictionary["Encode"]
 local Decode_Function = Dictionary["Decode"]
 local Write_Function = Dictionary["Writefile"]
-
-return Encode_Function, Decode_Function, Write_Function

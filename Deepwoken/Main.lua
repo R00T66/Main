@@ -203,7 +203,7 @@ local Notify_Enchant_WEAPON = function(Player, Enchant, Weapon, SoulBound)
     }
 end
 local Notify_Enchant_HAT = function(Player, Enchant, Hat)
-    Make_Sound("9123201396")
+    Make_Sound("9123218218")
 
     repeat
         wait()
@@ -325,7 +325,7 @@ end
 coroutine.resume(
     coroutine.create(
         function(...)
-            while wait(1) do
+            while wait(2) do
                 for i, v in pairs(Players:GetPlayers()) do
                     if v:FindFirstChild("Backpack") then
                         for i, x in pairs(v.Backpack:GetChildren()) do

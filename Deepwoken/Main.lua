@@ -274,9 +274,6 @@ local Check_And_Determine = function(x, v)
             return
         end
     elseif x:FindFirstChild("Enchant") then
-        if x then
-            return
-        end
 
         local EnchantValue = x:WaitForChild("Enchant").Value
 

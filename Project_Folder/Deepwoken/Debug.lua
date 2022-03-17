@@ -106,7 +106,7 @@ RunService.RenderStepped:Connect(function(...)
                              Enchant = JSON.Enchant                     
                            }
                            
-                           if JSON.Soulbound ~= nil then
+                           if JSON.SoulBound ~= nil then
                               Information.Soulbound = "YES"
                            else
                               Information.Soulbound = "NO"

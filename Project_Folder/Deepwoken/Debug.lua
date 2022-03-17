@@ -60,6 +60,7 @@ local Notify_Enchant = function(Enchant, Weapon, SoulBound)
    else
        Make_Sound("9123218218")
    end
+   
    repeat wait() until Debounce == false 
    
    Debounce = true 
@@ -78,7 +79,7 @@ local Notify_Enchant = function(Enchant, Weapon, SoulBound)
     Accept = {
      Text = "THX",
      Callback = function()
-        Debounce = false
+        Debounce = false        
      end
     }
    } 

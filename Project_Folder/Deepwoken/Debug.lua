@@ -113,13 +113,25 @@ local Get_Data = function(Str)
 end
 
 local Adjust_Data = function(String)
-   local STRING_FORMATTED = String:gsub("(.*)%@.*$","%1")
+   local STRING_FORMATTED;
+   
+   for i = 1,25 do
+      String = String:gsub("(.*)%@.*$","%1")
+   end
+   
+   STRING_FORMATTED = String
 
    return STRING_FORMATTED
 end
 
 local Adjust_Name = function(String)
-   local STRING_FORMATTED = String:gsub("(.*)%$.*$","%1")
+   local STRING_FORMATTED;
+   
+   for i = 1,25 do
+       String = String:gsub("(.*)%$.*$","%1")
+   end
+   
+   STRING_FORMATTED = String
 
    return STRING_FORMATTED
 end
@@ -149,7 +161,7 @@ local Make_Sound = function(ID)
        Sound:Destroy() 
    end) 
 end
-local Notify_Enchant = function(Player, Enchant, Weapon, SoulBound)
+local Notify_Enchant_WEAPON = function(Player, Enchant, Weapon, SoulBound)
 
    if SoulBound == "YES" then
        Make_Sound("9123201396")
@@ -170,7 +182,34 @@ local Notify_Enchant = function(Player, Enchant, Weapon, SoulBound)
    local String = Ex .. Line_Info .. Line_One .. Line_Two .. Line_Three
    
    Notifications:notification{
-    Title = "<font color='rgb(60, 40, 200)'>ENCHANT FOUND</font>",
+    Title = "<font color='rgb(60, 40, 200)'>ENCHANT FOUND [WEAPON]</font>",
+    Description = String,
+    Icon = 6023426926,
+    Accept = {
+     Text = "THX",
+     Callback = function()
+        Debounce = false        
+     end
+    }
+   } 
+end
+local Notify_Enchant_HAT = function(Player, Enchant, Hat)
+
+   Make_Sound("9123201396")
+   
+   repeat wait() until Debounce == false 
+   
+   Debounce = true 
+   
+   local Ex = "\n\n"
+   local Line_Info = "PLAYER: <font color='rgb(60, 40, 200)'>" .. Player .. "</font>\n"
+   local Line_One = "ENCHANT: <font color='rgb(60, 40, 200)'>" .. Enchant .. "</font>\n"
+   local Line_Two = "HAT: <font color='rgb(60, 40, 200)'>" .. Hat .. "</font>\n"
+   
+   local String = Ex .. Line_Info .. Line_One .. Line_Two
+   
+   Notifications:notification{
+    Title = "<font color='rgb(60, 40, 200)'>ENCHANT FOUND [HAT]</font>",
     Description = String,
     Icon = 6023426926,
     Accept = {
@@ -235,7 +274,7 @@ RunService.RenderStepped:Connect(function(...)
                            end
                             
                            Create_Log(Log_Information, "Weapon")
-                           Notify_Enchant(Information.PlayerName, Information.Enchant, Information.WeaponName .. " [ " .. Information.WeaponID .. " ]", Information.Soulbound)
+                           Notify_Enchant_WEAPON(Information.PlayerName, Information.Enchant, Information.WeaponName .. " [ " .. Information.WeaponID .. " ]", Information.Soulbound)
                       else
                          -- NOTHING!!
                       end
@@ -243,6 +282,56 @@ RunService.RenderStepped:Connect(function(...)
                 end
              end
           end               
+       end
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+     for i, v in pairs(Players:GetPlayers()) do
+       if v:FindFirstChild("Backpack") then
+          for i, x in pairs(v.Backpack:GetChildren()) do
+             if x:IsA("Tool") then
+                if x:FindFirstChild("Enchant") then
+	              if x.Enchant.Value ~= "" then
+								
+		            local Information = {
+                     PlayerName = v.Name,
+                     HatName = Adjust_Name(x.Name),
+                     HatID = "$" .. string.split(x.Name, "$")[2],
+                     Enchant = x.Enchant.Value     
+                    }
+                           
+                    local Log_Information = {
+                     Enchant = x.Enchant.Value,
+                     HatDeclaration = Adjust_Name(x.Name),
+                     PlayerName = v.Name
+                    }
+								
+		            for i, table_check in pairs(Enchants) do 
+                        if Players:FindFirstChild(table_check.Player) then
+                            
+                             local Player = Players:FindFirstChild(table_check.Player)
+                             
+                             if Player.Character then
+                                if table_check.Tool.Parent == Player.Character then
+                                   table.remove(Enchants, i)
+                                end
+                             end
+                         else
+                            table.remove(Enchants, i)
+                         end
+		             end	
+		
+		             if not Exists(Information.HatID) then
+		                print(Adjust_Name(x.Name))
+			            table.insert(Enchants, {Data = Information.HatID, Tool = x, Player = v.Name})										
+			            Create_Log(Log_Information, "Hat");										
+                        Notify_Enchant_HAT(Information.PlayerName, Information.Enchant, Information.HatName);						
+		             end
+		          end
+	           end
+	        end
+	      end
        end
     end
 end)

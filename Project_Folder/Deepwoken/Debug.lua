@@ -43,8 +43,23 @@ end
 
 local Debounce = false
 local Notifications = loadstring(game:HttpGet("https://raw.githubusercontent.com/AbstractPoo/Main/main/Notifications.lua"))()
+local Make_Sound = function(ID)
+   local Sound = Instance.new("Sound", game:GetService("CoreGui"));
+   Sound.SoundId = "rbxassetid://" .. ID;
+   Sound.Volume = 2;
+   Sound:Play()
+   
+   Sound.Stopped:Connect(function()
+       Sound:Destroy() 
+   end) 
+end
 local Notify_Enchant = function(Enchant, Weapon, SoulBound)
 
+   if SoulBound == "YES" then
+       Make_Sound("9123201396")
+   else
+       Make_Sound("9123218218")
+   end
    repeat wait() until Debounce == false 
    
    Debounce = true 

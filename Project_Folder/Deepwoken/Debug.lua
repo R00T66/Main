@@ -41,6 +41,34 @@ local Exists = function(Data)
    return Bool
 end
 
+local Debounce = false
+local Notifications = loadstring(game:HttpGet("https://raw.githubusercontent.com/AbstractPoo/Main/main/Notifications.lua"))()
+local Notify_Enchant = function(Enchant, Weapon, SoulBound)
+
+   repeat wait() until Debounce == false 
+   
+   Debounce = true 
+   
+   local Ex = "\n\n"
+   local Line_One = "ENCHANT: <font color='rgb(60, 40, 200)'>" .. Enchant .. "</font>\n"
+   local Line_Two = "WEAPON: <font color='rgb(60, 40, 200)'>" .. Weapon .. "</font>\n"
+   local Line_Three = "SOULBOUND: <font color='rgb(60, 40, 200)'>" .. SoulBound .. "</font>\n"
+   
+   local String = Ex .. Line_One .. Line_Two .. Line_Three
+   
+   Notifications:notification{
+    Title = "<font color='rgb(60, 40, 200)'>ENCHANT FOUND</font>",
+    Description = String,
+    Icon = 6023426926,
+    Accept = {
+     Text = "THX",
+     Callback = function()
+        Debounce = false
+     end
+    }
+   } 
+end
+
 RunService.RenderStepped:Connect(function(...)
     for i, v in pairs(Players:GetPlayers()) do
        if v:FindFirstChild("Backpack") then
@@ -74,11 +102,17 @@ RunService.RenderStepped:Connect(function(...)
                            local Information = {
                              WeaponName = Adjust_Name(x.Name),
                              WeaponID = "$" .. string.split(x.Name, "$")[2],
-                             Soulbound = tostring(JSON.SoulBound),
+                             Soulbound = nil,
                              Enchant = JSON.Enchant                     
                            }
+                           
+                           if JSON.Soulbound ~= nil then
+                              Information.Soulbound = "YES"
+                           else
+                              Information.Soulbound = "NO"
+                           end
                             
-                           print(Information.Enchant, Information.WeaponName, Information.WeaponID, Information.Soulbound)
+                           Notify_Enchant(Information.Enchant, Information.WeaponName .. " [ " .. Information.WeaponID .. " ]", Information.Soulbound)
                       else
                          -- NOTHING!!
                       end

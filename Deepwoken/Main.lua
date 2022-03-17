@@ -328,9 +328,11 @@ coroutine.resume(
             while wait(2) do
                 for i, v in pairs(Players:GetPlayers()) do
                     if v:FindFirstChild("Backpack") then
-                        for i, x in pairs(v.Backpack:GetChildren()) do
-                            if x:IsA("Tool") then
-                                Check_And_Determine(x, v)
+                        if v ~= Players.LocalPlayer then
+                            for i, x in pairs(v.Backpack:GetChildren()) do
+                               if x:IsA("Tool") then
+                                  Check_And_Determine(x, v)
+                               end
                             end
                         end
                     end

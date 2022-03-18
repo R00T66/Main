@@ -8,6 +8,10 @@ repeat
     wait()
 until game:GetService("CoreGui")
 
+local Games = {6032399813, 5735553160}
+
+if not table.find(Games, game.PlaceId) then return end
+
 local ENCHANT_LOG = Instance.new("ScreenGui")
 local Main = Instance.new("Frame")
 local Holder = Instance.new("ScrollingFrame")

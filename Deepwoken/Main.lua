@@ -88,6 +88,7 @@ local Create_Log = function(Information, Type)
         Log.Text = Log.Text:gsub("PLAYER", Information.PlayerName)
         Log.Text = Log.Text:gsub("EXAMPLE", Information.Enchant)
         Log.Text = Log.Text:gsub("MYB", Information.Soulbound)
+        Log.Text = Log.Text .. " [WEAPON: " .. Information.WeaponName .. "]"
 
         Log.Parent = Holder
         Log.Visible = true
@@ -261,7 +262,8 @@ local Check_And_Determine = function(x, v)
             local Log_Information = {
                 Enchant = JSON.Enchant,
                 Soulbound = nil,
-                PlayerName = v.Name
+                PlayerName = v.Name,
+                WeaponName = Adjust_Name(x.Name)
             }
 
             if JSON.SoulBound ~= nil then
@@ -336,10 +338,12 @@ local Refresh_Enchants = function()
     end
 end
 
+local TickSpeed = 0.5
+
 coroutine.resume(
     coroutine.create(
         function(...)
-            while wait(.5) do
+            while wait(TickSpeed) do
                 for i, v in pairs(Players:GetPlayers()) do
                     if v:FindFirstChild("Backpack") then
                         if v ~= Players.LocalPlayer then
@@ -357,3 +361,9 @@ coroutine.resume(
         end
     )
 )
+
+game:GetService("StarterGui"):SetCore("SendNotification", {
+  Title = "Information:",
+  Text = "The current tick speed is " .. tostring(TickSpeed),
+  Duration = 10
+})

@@ -196,7 +196,7 @@ local Notify_Enchant_WEAPON = function(Player, Enchant, Weapon, SoulBound)
         Description = String,
         Icon = 6023426926,
         Accept = {
-            Text = "COPY SERVER (ID)",
+            Text = "COPY SERVER",
             Callback = function()
                 setclipboard(game.JobId)
                 Debounce = false
@@ -231,7 +231,7 @@ local Notify_Enchant_HAT = function(Player, Enchant, Hat)
         Description = String,
         Icon = 6023426926,
         Accept = {
-            Text = "COPY SERVER (ID)",
+            Text = "COPY SERVER"",
             Callback = function()
                 setclipboard(game.JobId)
                 Debounce = false

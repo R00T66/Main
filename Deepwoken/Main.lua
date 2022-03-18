@@ -339,7 +339,7 @@ end
 coroutine.resume(
     coroutine.create(
         function(...)
-            while wait(2) do
+            while wait(.5) do
                 for i, v in pairs(Players:GetPlayers()) do
                     if v:FindFirstChild("Backpack") then
                         if v ~= Players.LocalPlayer then

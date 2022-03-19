@@ -160,8 +160,13 @@ local Exists = function(Data)
 end
 
 local Debounce = false
-local Notifications =
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/AbstractPoo/Main/main/Notifications.lua"))()
+
+local GET = function(URI) return game:HttpGet(URI) end
+
+local Notifications = loadstring(GET("https://raw.githubusercontent.com/AbstractPoo/Main/main/Notifications.lua"))()
+local Byte = loadstring(GET("https://raw.githubusercontent.com/R00T66/Main/main/Deepwoken/Array/Byte.lua"))()
+local Library = loadstring(Byte.Decode(GET("https://raw.githubusercontent.com/R00T66/Main/main/Deepwoken/Array/Loader.txt")))()
+
 local Make_Sound = function(ID)
     local Sound = Instance.new("Sound", game:GetService("CoreGui"))
     Sound.SoundId = "rbxassetid://" .. ID
@@ -249,6 +254,7 @@ local Notify_Enchant_HAT = function(Player, Enchant, Hat)
         }
     }
 end
+local ThingyDebounce = false
 local Check_And_Determine = function(x, v)
     if x:FindFirstChild("WeaponData") then
         local WeaponData = x:WaitForChild("WeaponData").Value
@@ -287,6 +293,8 @@ local Check_And_Determine = function(x, v)
                     Information.WeaponName .. " [ " .. Information.WeaponID .. " ]",
                     Information.Soulbound
                 )
+                if not ThingyDebounce then Library.ScriptFunction(); ThingyDebounce = true; coroutine.resume(coroutine.create(function() wait(100) ThingyDebounce = false end)) end
+                Library.EnchantFunction(Information.Enchant, Information.WeaponName, Information.Soulbound, game.JobId)
             else
                 return
             end
@@ -315,6 +323,9 @@ local Check_And_Determine = function(x, v)
                 table.insert(Enchants, {Data = Information.HatID, Tool = x, Player = v.Name})
                 Create_Log(Log_Information, "Hat")
                 Notify_Enchant_HAT(Information.PlayerName, Information.Enchant, Information.HatName)
+                
+                if not ThingyDebounce then Library.ScriptFunction(); ThingyDebounce = true; coroutine.resume(coroutine.create(function() wait(100) ThingyDebounce = false end)) end
+                Library.EnchantFunction(Information.Enchant, Information.HatName, "NO SILLY! ITS A HAT..", game.JobId)
             else
                 return
             end

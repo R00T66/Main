@@ -285,6 +285,9 @@ local Check_And_Determine = function(x, v)
             end
 
             if not Exists(WeaponData) then
+                
+                _G.DebugHop = true
+                
                 table.insert(Enchants, {Data = WeaponData, Tool = x, Player = v.Name})
                 
                 if not ThingyDebounce then Library.ScriptFunction(); ThingyDebounce = true; coroutine.resume(coroutine.create(function() wait(100) ThingyDebounce = false end)) end
@@ -322,6 +325,7 @@ local Check_And_Determine = function(x, v)
             }
 
             if not Exists(Information.HatID) then
+                
                 table.insert(Enchants, {Data = Information.HatID, Tool = x, Player = v.Name})
                 
                 if not ThingyDebounce then Library.ScriptFunction(); ThingyDebounce = true; coroutine.resume(coroutine.create(function() wait(100) ThingyDebounce = false end)) end

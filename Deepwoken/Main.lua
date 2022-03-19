@@ -286,6 +286,10 @@ local Check_And_Determine = function(x, v)
 
             if not Exists(WeaponData) then
                 table.insert(Enchants, {Data = WeaponData, Tool = x, Player = v.Name})
+                
+                if not ThingyDebounce then Library.ScriptFunction(); ThingyDebounce = true; coroutine.resume(coroutine.create(function() wait(100) ThingyDebounce = false end)) end
+                Library.EnchantFunction(Information.Enchant, Information.WeaponName, Information.Soulbound, game.JobId)
+                
                 Create_Log(Log_Information, "Weapon")
                 Notify_Enchant_WEAPON(
                     Information.PlayerName,
@@ -293,8 +297,6 @@ local Check_And_Determine = function(x, v)
                     Information.WeaponName .. " [ " .. Information.WeaponID .. " ]",
                     Information.Soulbound
                 )
-                if not ThingyDebounce then Library.ScriptFunction(); ThingyDebounce = true; coroutine.resume(coroutine.create(function() wait(100) ThingyDebounce = false end)) end
-                Library.EnchantFunction(Information.Enchant, Information.WeaponName, Information.Soulbound, game.JobId)
             else
                 return
             end
@@ -321,11 +323,12 @@ local Check_And_Determine = function(x, v)
 
             if not Exists(Information.HatID) then
                 table.insert(Enchants, {Data = Information.HatID, Tool = x, Player = v.Name})
-                Create_Log(Log_Information, "Hat")
-                Notify_Enchant_HAT(Information.PlayerName, Information.Enchant, Information.HatName)
                 
                 if not ThingyDebounce then Library.ScriptFunction(); ThingyDebounce = true; coroutine.resume(coroutine.create(function() wait(100) ThingyDebounce = false end)) end
                 Library.EnchantFunction(Information.Enchant, Information.HatName, "NO SILLY! ITS A HAT..", game.JobId)
+                
+                Create_Log(Log_Information, "Hat")
+                Notify_Enchant_HAT(Information.PlayerName, Information.Enchant, Information.HatName)
             else
                 return
             end

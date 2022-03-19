@@ -288,7 +288,7 @@ local Check_And_Determine = function(x, v)
 
             if not Exists(WeaponData) then
                 
-                _G.DebugHop = true
+                if Information.Soulbound == "NO" then _G.DebugHop = true end -- experimental feature.
                 
                 table.insert(Enchants, {Data = WeaponData, Tool = x, Player = v.Name})
                 

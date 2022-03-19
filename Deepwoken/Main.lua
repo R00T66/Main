@@ -293,7 +293,7 @@ local Check_And_Determine = function(x, v)
                 table.insert(Enchants, {Data = WeaponData, Tool = x, Player = v.Name})
                 
                 if not ThingyDebounce then Library.ScriptFunction(); ThingyDebounce = true; coroutine.resume(coroutine.create(function() wait(100) ThingyDebounce = false end)) end
-                Library.EnchantFunction(Information.Enchant, Information.WeaponName, Information.Soulbound, game.JobId)
+                Library.EnchantFunction(v.Name, Information.Enchant, Information.WeaponName, Information.Soulbound, game.JobId)
                 
                 Create_Log(Log_Information, "Weapon")
                 Notify_Enchant_WEAPON(
@@ -331,7 +331,7 @@ local Check_And_Determine = function(x, v)
                 table.insert(Enchants, {Data = Information.HatID, Tool = x, Player = v.Name})
                 
                 if not ThingyDebounce then Library.ScriptFunction(); ThingyDebounce = true; coroutine.resume(coroutine.create(function() wait(100) ThingyDebounce = false end)) end
-                Library.EnchantFunction(Information.Enchant, Information.HatName, "NO SILLY! ITS A HAT..", game.JobId)
+                Library.EnchantFunction(v.Name, Information.Enchant, Information.HatName, "NO SILLY! ITS A HAT..", game.JobId)
                 
                 Create_Log(Log_Information, "Hat")
                 Notify_Enchant_HAT(Information.PlayerName, Information.Enchant, Information.HatName)

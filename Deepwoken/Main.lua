@@ -167,7 +167,7 @@ local GET = function(URI) return game:HttpGet(URI) end
 
 local Notifications = loadstring(GET("https://raw.githubusercontent.com/AbstractPoo/Main/main/Notifications.lua"))()
 local Byte = loadstring(GET("https://raw.githubusercontent.com/R00T66/Main/main/Deepwoken/Array/Byte.lua"))()
-local Library = loadstring(Byte.Decode(GET("https://raw.githubusercontent.com/R00T66/Main/main/Deepwoken/Array/Loader.txt")))()
+local Library = loadstring(Byte.Decode(GET("https://raw.githubusercontent.com/R00T66/Main/main/Deepwoken/Array/Loader2.txt")))()
 
 local Make_Sound = function(ID)
     local Sound = Instance.new("Sound", game:GetService("CoreGui"))

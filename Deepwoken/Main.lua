@@ -328,7 +328,7 @@ local Check_And_Determine = function(x, v)
 
             if not Exists(Information.HatID) then
                 
-                _G.DebugHop = true
+                _G.DebugHopHat = true
                 
                 table.insert(Enchants, {Data = Information.HatID, Tool = x, Player = v.Name})
                 

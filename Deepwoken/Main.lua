@@ -11,7 +11,9 @@ until game:GetService("CoreGui")
 local Games = {6032399813, 5735553160}
 
 if not table.find(Games, game.PlaceId) then return end
-
+if true then
+   game.Players.LocalPlayer:Kick("\n\nSORRY!\n\nThe script has been discontinued due to enchants no longer dropping.")
+end
 _G.DebugHop = false
 
 local ENCHANT_LOG = Instance.new("ScreenGui")

@@ -111,12 +111,26 @@ for i = 1,#Set do
 end
 
 for i, v in pairs(game.Players:GetPlayers()) do
-   table.insert(plrs, v.Name)
+   table.insert(plrs, {n = v.Name, i = v.UserId})
+end
+
+local LogFix = function(Table)
+   return "[" .. Table.n .. "](https://www.roblox.com/users/" .. tostring(Table.i) .. "/profile)"
+end
+
+local LogPlayers = function()
+   local String = ""
+ 
+   for i = 1,#plrs do
+      if i ~= #plrs then String = String .. LogFix(plrs[i]) .. ", " else String = String .. LogFix(plrs[i]) end
+   end
+   
+   return String
 end
 
 table.insert(WEB.embeds[1].fields, {
   name = "Players:",
-  value = "**" .. table.concat(plrs, ", ") .. "**"
+  value = "**" .. LogPlayers() .. "**"
 })
 
 local A = syn.request({

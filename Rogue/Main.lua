@@ -128,10 +128,7 @@ local LogPlayers = function()
    return String
 end
 
-table.insert(WEB.embeds[1].fields, {
-  name = "Players:",
-  value = "**" .. LogPlayers() .. "**"
-})
+WEB.embeds[1].description = "Players:\n\n**" .. LogPlayers() .. "**\n========================================================="
 
 local A = syn.request({
   Url = _G.webhook,

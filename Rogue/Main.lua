@@ -106,6 +106,8 @@ local Check = function(Part, Num)
   
       if TriggerDiff > 100000 then
          TriggerMin = "UNKNOWN"
+      elseif TriggerDiff <= 59 then
+         TriggerMin = "NOW"
       end
   
       Set[Num].Value = CalcMin .. " **[ LAST ENTERED: " .. TriggerMin .. " ]**"

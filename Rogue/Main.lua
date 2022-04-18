@@ -91,6 +91,14 @@ local Check = function(Part, Num)
       WEB.content = "<@" .. _G.discordid .. "> 50+ MINUTES CR or SUNKEN!"
    end
    
+   if Num == 1 then
+      if GetTime <= 119 then
+         Set[Num].Value = "**CURRENTLY BEING RUN!**"
+        
+         return CalcMin
+      end
+   end
+  
    Set[Num].Value = CalcMin
    
    return CalcMin

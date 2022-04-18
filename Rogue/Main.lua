@@ -6,6 +6,7 @@ local CastleRock = Trigger :WaitForChild("BoundShrieker4") -- 1
 local DeepSunken = Trigger:WaitForChild("evileye1") -- 2
 local Sunken = Trigger:WaitForChild("evileye2") -- 3
 local LavaSnake = Trigger:WaitForChild("MazeSnakes") -- 4
+local CRTrigger = Trigger:WaitForChild("CastleRockSnake") -- 1 EX
 
 local CheckTable = {
  [1] = CastleRock,
@@ -92,11 +93,24 @@ local Check = function(Part, Num)
    end
    
    if Num == 1 then
+  
       if GetTime <= 119 then
          Set[Num].Value = "**CURRENTLY BEING RUN!**"
         
          return CalcMin
       end
+    
+      local TriggerTimer = GetTimer(CRTrigger)
+      local TriggerDiff = GetTimeDifference(TriggerTimer)
+      local TriggerMin = ToMinutes(TriggerDiff)
+  
+      if TriggerDiff > 100000 then
+         TriggerMin = "UNKNOWN"
+      end
+  
+      Set[Num].Value = CalcMin .. " **[ LAST ENTERED: " .. TriggerMin .. " ]**"
+  
+      return CalcMin
    end
   
    Set[Num].Value = CalcMin

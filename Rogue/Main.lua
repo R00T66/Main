@@ -80,20 +80,15 @@ local Check = function(Part, Num)
 
    local GetTime = GetTimeDifference(Timer)
    local CalcMin = ToMinutes(GetTime)
-   local Acc = {1,3}
    
    if GetTime > 100000 then
-      Set[Num].Value = "**INVALID**"
+      Set[Num].Value = "**[NEVER RAN]**"
       
       return       
    end
    
-   if GetTime >= 3000 and table.find(Acc, Num) then
-      WEB.content = "<@" .. _G.discordid .. "> 50+ MINUTES CR or SUNKEN!"
-   end
-   
    if Num == 1 then
-  
+      
       if GetTime <= 119 then
          Set[Num].Value = "**CURRENTLY BEING RUN!**"
         
@@ -103,11 +98,15 @@ local Check = function(Part, Num)
       local TriggerTimer = GetTimer(CRTrigger)
       local TriggerDiff = GetTimeDifference(TriggerTimer)
       local TriggerMin = ToMinutes(TriggerDiff)
-  
+   
       if TriggerDiff > 100000 then
          TriggerMin = "UNKNOWN"
       elseif TriggerDiff <= 59 then
          TriggerMin = "NOW"
+      end     
+  
+      if TriggerDiff >= 3000 then
+         WEB.content = "<@" .. _G.discordid .. "> **50 MINUTE(S) UNBOTTED CR!**"
       end
   
       Set[Num].Value = CalcMin .. " **[ LAST ENTERED: " .. TriggerMin .. " ]**"

@@ -109,7 +109,7 @@ local Check = function(Part, Num)
          WEB.content = "<@" .. _G.discordid .. "> **50 MINUTE(S) UNBOTTED CR!**"
       end
       
-      if (TriggerDiff / 60) < 40 and _G.CRBOTTING == true then
+      if (TriggerDiff / 60) < 40 and TriggerMin ~= "UNKNOWN" and _G.CRBOTTING == true then
      
          local Players = game.Players:GetPlayers()
          local Random = Players[math.random(1, #Players)]

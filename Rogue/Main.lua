@@ -108,6 +108,19 @@ local Check = function(Part, Num)
       if TriggerDiff >= 3000 then
          WEB.content = "<@" .. _G.discordid .. "> **50 MINUTE(S) UNBOTTED CR!**"
       end
+      
+      if (TriggerDiff / 60) < 40 and _G.CRBOTTING == true then
+     
+         local Players = game.Players:GetPlayers()
+         local Random = Players[math.random(1, #Players)]
+   
+         repeat wait() Random = Players[math.random(1, #Players)] until Random ~= game.Players.LocalPlayer
+   
+         local r = syn.request({Url = "http://localhost:7963/BlockUser?Account=" .. game.Players.LocalPlayer.Name .. "&UserId=" .. Random.UserId, Method = "GET"})
+         
+         warn(r.StatusCode)
+         while wait() do game:GetService("TeleportService"):Teleport(3016661674) end
+      end
   
       Set[Num].Value = CalcMin .. " **[ LAST ENTERED: " .. TriggerMin .. " ]**"
   

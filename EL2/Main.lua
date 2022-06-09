@@ -2,7 +2,7 @@ repeat wait() until game.IsLoaded
 repeat wait() until game.Players.LocalPlayer
 repeat wait() until game.Players.LocalPlayer.Character
 
-wait(.5)
+wait(1.5)
 
 local Kiriot = loadstring(game:HttpGet("https://kiriot22.com/releases/ESP.lua"))(); Kiriot.Boxes = false
 local Player = game:GetService("Players").LocalPlayer;
@@ -178,19 +178,16 @@ UserInputService.InputEnded:Connect(function(inp, g)
 end)
 
 RunService.Stepped:Connect(function()
-    if (FlyEnabled == true and Player.Character and Player.Character:FindFirstChild("Torso") and Player.Character:FindFirstChild("HumanoidRootPart")) then 
-        UpdateFlight();
-    end;
-end)
-RunService.Stepped:Connect(function()
-	if (Noclip == true and Player.Character) then
+    if (Noclip == true and Player.Character) then
 		for i,v in pairs(Player.Character:GetDescendants()) do
 			if (v:IsA('BasePart')) then v.CanCollide = false; end;
 	    end;
-	end;
-end)
-RunService.Stepped:Connect(function()
-	if (Player.Character) then
+    end;
+
+    if (FlyEnabled == true and Player.Character and Player.Character:FindFirstChild("Torso") and Player.Character:FindFirstChild("HumanoidRootPart")) then 
+        UpdateFlight();
+    end;
+    	if (Player.Character) then
 		if Player.Character:FindFirstChild("HumanoidRootPart") then
 		   
 		   local TrinketFolder = workspace.MouseIgnore

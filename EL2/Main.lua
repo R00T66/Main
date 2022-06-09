@@ -141,7 +141,10 @@ local function UpdateFlight()
     end;
 end;
 
-UserInputService.InputBegan:Connect(function(inp)
+UserInputService.InputBegan:Connect(function(inp, g)
+    
+    if g then return end
+    
     if (inp.KeyCode == Enum.KeyCode.W) then 
         Keys.W = 1;
     end;
@@ -156,7 +159,10 @@ UserInputService.InputBegan:Connect(function(inp)
     end;
 end)
 
-UserInputService.InputEnded:Connect(function(inp)
+UserInputService.InputEnded:Connect(function(inp, g)
+    
+    if g then return end
+    
     if (inp.KeyCode == Enum.KeyCode.W) then 
         Keys.W = 0;
     end;

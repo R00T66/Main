@@ -2,7 +2,7 @@ repeat wait() until game.IsLoaded
 repeat wait() until game.Players.LocalPlayer
 repeat wait() until game.Players.LocalPlayer.Character
 
-wait(1.5)
+wait(1)
 
 local Kiriot = loadstring(game:HttpGet("https://kiriot22.com/releases/ESP.lua"))(); Kiriot.Boxes = false
 local Player = game:GetService("Players").LocalPlayer;

@@ -284,7 +284,7 @@ for i, v in pairs(Players:GetPlayers()) do
    end
 end
 
-Players.PlayerAdded:Connect(v)
+Players.PlayerAdded:Connect(function(v)
     if Check(v) ~= false then
        ModAlert(v.Name, Check(v))
     end

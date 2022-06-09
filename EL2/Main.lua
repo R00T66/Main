@@ -10,6 +10,7 @@ local Camera = workspace.CurrentCamera;
 
 local RunService = game:GetService("RunService");
 local UserInputService = game:GetService("UserInputService");
+local Players = game:GetService("Players")
 
 local Killbricks = {"ArdorianKillbrick", "KillBrick", "Lava", "Killbrickeeee"}
 
@@ -59,6 +60,40 @@ local KB = function(value)
    if value then for i, v in pairs(workspace:GetDescendants()) do if table.find(Killbricks, v.Name) then
           v.Parent = KillbrickHolder
    end end end
+end
+local AdminRoles = {"admin", "dev", "god", "owner"}
+local Check = function(Player)
+    local InGroup;
+    local Role;
+    
+    pcall(function()
+        InGroup = Player:IsInGroup(12832629)
+    end)
+    
+    if InGroup ~= false and InGroup ~= nil then
+       pcall(function()
+           Role = Player:GetRoleInGroup(12832629)
+       end) 
+       
+       if table.find(AdminRoles, Role:lower()) then return Role:upper() else return false end
+    else
+       return false
+    end
+end
+local ModAlert = function(Name, Role)
+   game:GetService("StarterGui"):SetCore("SendNotification", {
+     Title = "MOD ALERT",
+     Text = Name .. " [ " .. Role .. " ]",
+     Button1 = "OK",
+     Button2 = "HOP",
+     Callback = function(Text)
+	if Text == "OK" then 
+	    return
+	else
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/R00T66/Main/main/EL2/Hop.lua"))()
+	end
+     end
+   })
 end
 
 LoadSettingsLOL();
@@ -242,3 +277,15 @@ end)
 -- INIT
 
 VEN:SelectPage(VEN.pages[1], true)
+
+for i, v in pairs(Players:GetPlayers()) do
+   if Check(v) ~= false then
+      ModAlert(v.Name, Check(v))
+   end
+end
+
+Players.PlayerAdded:Connect(v)
+    if Check(v) ~= false then
+       ModAlert(v.Name, Check(v))
+    end
+end)

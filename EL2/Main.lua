@@ -81,18 +81,25 @@ local Check = function(Player)
     end
 end
 local ModAlert = function(Name, Role)
+    
+   local Func = Instance.new("BindableFunction")
+   
+   Func.OnInvoke = function(Text)
+       if Text == "OK" then 
+	       return
+	    else
+	       Player:Kick("\n[HOPPING]")
+	       wait(1)
+           loadstring(game:HttpGet("https://raw.githubusercontent.com/R00T66/Main/main/EL2/Hop.lua"))()
+       end
+   end
+   
    game:GetService("StarterGui"):SetCore("SendNotification", {
      Title = "MOD ALERT",
      Text = Name .. " [ " .. Role .. " ]",
      Button1 = "OK",
      Button2 = "HOP",
-     Callback = function(Text)
-	if Text == "OK" then 
-	    return
-	else
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/R00T66/Main/main/EL2/Hop.lua"))()
-	end
-     end
+     Callback = Func
    })
 end
 

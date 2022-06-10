@@ -239,9 +239,9 @@ function boxBase:Update()
       
 	    local Prime = self.PrimaryPart["Parent"]	
 			
-	    if Prime:FindFirstChild("Humanoid") and ESP.ShowHealth then
+	    if Prime:FindFirstChild("Humanoid") then
                self.Components.Health.Visible = true
-               self.Components.Health.Position = Vector2.new(TagPos.X, TagPos.Y + 28)
+               self.Components.Health.Position = Vector2.new(TagPos.X, TagPos.Y + 14)
                self.Components.Health.Text = "[" .. Prime:FindFirstChild("Humanoid").Health .. "/" .. Prime:FindFirstChild("Humanoid").MaxHealth .. "]"
                self.Components.Health.Color = color
 	    end

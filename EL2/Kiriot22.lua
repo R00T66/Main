@@ -129,6 +129,7 @@ function ESP:AddObjectListener(parent, options)
     end
 end
 
+-- xd 
 local boxBase = {}
 boxBase.__index = boxBase
 
@@ -248,10 +249,12 @@ function boxBase:Update()
         else
             self.Components.Name.Visible = false
             self.Components.Distance.Visible = false
+	    self.Components.Health.Visible = false
         end
     else
         self.Components.Name.Visible = false
         self.Components.Distance.Visible = false
+	self.Components.Health.Visible = false
     end
     
     if ESP.Tracers then

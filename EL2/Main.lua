@@ -99,6 +99,7 @@ local ModAlert = function(Name, Role)
      Text = Name .. " [ " .. Role .. " ]",
      Button1 = "OK",
      Button2 = "HOP",
+     Duration = 35235325
      Callback = Func
    })
 end

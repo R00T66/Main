@@ -237,10 +237,12 @@ function boxBase:Update()
             self.Components.Distance.Text = math.floor((cam.CFrame.p - cf.p).magnitude) .."M"
             self.Components.Distance.Color = color
       
-            self.Components.Health.Visible = true
-            self.Components.Health.Position = Vector2.new(TagPos.X, TagPos.Y + 28)
-            self.Components.Health.Text = "[" .. GetHealth(self) .. "/a]"
-            self.Components.Health.Color = color
+	    if self.PrimaryPart:FindFirstChild("Humanoid") then
+               self.Components.Health.Visible = true
+               self.Components.Health.Position = Vector2.new(TagPos.X, TagPos.Y + 28)
+               self.Components.Health.Text = "[" .. self.PrimaryPart:FindFirstChild("Humanoid").Health .. "/" .. self.PrimaryPart:FindFirstChild("Humanoid").MaxHealth .. "]"
+               self.Components.Health.Color = color
+	    end
         else
             self.Components.Name.Visible = false
             self.Components.Distance.Visible = false

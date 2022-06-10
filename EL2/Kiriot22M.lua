@@ -141,8 +141,8 @@ function boxBase:Remove()
     end
 end
 
-function GetHealth(a)
-   return (a.Name .. " [ " .. a.Parent.Name .. " ]")
+function GetHealth(Humanoid)
+   return (Humanoid.Health .. "/" .. Humanoid.MaxHealth)
 end
 
 function boxBase:Update()
@@ -241,8 +241,8 @@ function boxBase:Update()
 			
 	    if Prime:FindFirstChild("Humanoid") then
                self.Components.Health.Visible = true
-               self.Components.Health.Position = Vector2.new(TagPos.X, TagPos.Y + 14)
-               self.Components.Health.Text = "[" .. Prime:FindFirstChild("Humanoid").Health .. "/" .. Prime:FindFirstChild("Humanoid").MaxHealth .. "]"
+               self.Components.Health.Position = Vector2.new(TagPos.X, TagPos.Y + 28)
+               self.Components.Health.Text = "[" .. GetHealth(Prime:FindFirstChild("Humanoid")) .. "]"
                self.Components.Health.Color = color
 	    end
         else

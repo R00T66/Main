@@ -264,10 +264,6 @@ function boxBase:Update()
     else
         self.Components.Tracer.Visible = false
     end
-  
-    if ESP.ShowHealth then
-    
-    enf
 end
 
 function ESP:Add(obj, options)

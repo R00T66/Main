@@ -142,7 +142,7 @@ function boxBase:Remove()
 end
 
 function GetHealth(Humanoid)
-   return (Humanoid.Health .. "/" .. Humanoid.MaxHealth)
+   return (math.floor(Humanoid.Health) .. "/" .. math.floor(Humanoid.MaxHealth))
 end
 
 function boxBase:Update()

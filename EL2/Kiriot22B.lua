@@ -237,6 +237,8 @@ function boxBase:Update()
             self.Components.Distance.Text = math.floor((cam.CFrame.p - cf.p).magnitude) .."M"
             self.Components.Distance.Color = color
       
+	    warn(self.PrimaryPart)
+			
 	    if self.PrimaryPart:FindFirstChild("Humanoid") then
                self.Components.Health.Visible = true
                self.Components.Health.Position = Vector2.new(TagPos.X, TagPos.Y + 28)

@@ -234,13 +234,13 @@ function boxBase:Update()
             
             self.Components.Distance.Visible = true
             self.Components.Distance.Position = Vector2.new(TagPos.X, TagPos.Y + 14)
-            self.Components.Distance.Text = math.floor((cam.CFrame.p - cf.p).magnitude) .."m away"
+            self.Components.Distance.Text = math.floor((cam.CFrame.p - cf.p).magnitude) .."M"
             self.Components.Distance.Color = color
       
-            self.Components.Distance.Visible = true
-            self.Components.Distance.Position = Vector2.new(TagPos.X, TagPos.Y + 14)
-            self.Components.Distance.Text = "[" .. GetHealth(self) .. "/a]"
-            self.Components.Distance.Color = color
+            self.Components.Health.Visible = true
+            self.Components.Health.Position = Vector2.new(TagPos.X, TagPos.Y + 28)
+            self.Components.Health.Text = "[" .. GetHealth(self) .. "/a]"
+            self.Components.Health.Color = color
         else
             self.Components.Name.Visible = false
             self.Components.Distance.Visible = false
@@ -316,6 +316,13 @@ function ESP:Add(obj, options)
         Size = 19,
         Visible = self.Enabled and self.Names
 	})
+	box.Components["Health"] = Draw("Text", {
+		Color = box.Color,
+		Center = true,
+		Outline = true,
+        Size = 19,
+        Visible = self.Enabled and self.Names
+	})
 	
 	box.Components["Tracer"] = Draw("Line", {
 		Thickness = ESP.Thickness,
@@ -342,7 +349,7 @@ function ESP:Add(obj, options)
             if ESP.AutoRemove ~= false then
                 box:Remove()
             end
-		end)
+	end)
     end
 
     return box

@@ -4,7 +4,7 @@ repeat wait() until game.Players.LocalPlayer.Character
 
 wait(1)
 
-local Kiriot = loadstring(game:HttpGet("https://kiriot22.com/releases/ESP.lua"))(); Kiriot.Boxes = false
+local Kiriot = loadstring(game:HttpGet("https://raw.githubusercontent.com/R00T66/Main/main/EL2/Kiriot22.lua"))(); Kiriot.Boxes = false; Kiriot.Color = Color3.fromRGB(75, 0, 130)
 local Player = game:GetService("Players").LocalPlayer;
 local Camera = workspace.CurrentCamera;
 
@@ -99,7 +99,6 @@ local ModAlert = function(Name, Role)
      Text = Name .. " [ " .. Role .. " ]",
      Button1 = "OK",
      Button2 = "HOP",
-     Duration = 35235325,
      Callback = Func
    })
 end

@@ -4,7 +4,7 @@ repeat wait() until game.Players.LocalPlayer.Character
 
 wait(1)
 
-local Kiriot = loadstring(game:HttpGet("https://raw.githubusercontent.com/R00T66/Main/main/EL2/Kiriot22.lua"))(); Kiriot.Boxes = false; Kiriot.Color = Color3.fromRGB(75, 0, 130)
+local Kiriot = loadstring(game:HttpGet("https://raw.githubusercontent.com/R00T66/Main/main/EL2/Kiriot22.lua"))(); Kiriot.Boxes = false;
 local Player = game:GetService("Players").LocalPlayer;
 local Camera = workspace.CurrentCamera;
 
@@ -13,16 +13,12 @@ local UserInputService = game:GetService("UserInputService");
 local Players = game:GetService("Players")
 
 local Killbricks = {"ArdorianKillbrick", "KillBrick", "Lava", "Killbrickeeee"}
-
-local Trinkets = {
- ["Goblet"] = false,
- ["Old Amulet"] = false
-}
-
 local Settings = {
- ["TrinketESP"] = false,
+ ["TrinketESP"] = true,
+ ["TrinketEspColor"] = {255, 170, 0},
  ["PlayerESP"] = {
-     Enabled = false
+     Enabled = true,
+     Color = {75, 0, 130}
  },
  ["AutoPickup"] = false,
  ["EyeESP"] = false,
@@ -35,6 +31,9 @@ local FlySpeed = 40
 local Noclip = false
 
 local HttpService = game:GetService("HttpService")
+local MakeRGB = function(Number)
+   return math.floor(Number * 255)
+end
 local SaveSettingsLOL = function()
    writefile("EL2.Settings", HttpService:JSONEncode({
       MainSettings = Settings,
@@ -43,7 +42,20 @@ local SaveSettingsLOL = function()
 end
 local LoadSettingsLOL = function()
    if isfile("EL2.Settings") then
+       
        local LoadSettings = HttpService:JSONDecode(readfile("EL2.Settings"))
+       
+       if LoadSettings.MainSettings["PlayerESP"].Color == nil then
+          SaveSettingsLOL()
+          
+          return
+       end
+       
+       if LoadSettings.MainSettings["TrinketEspColor"] == nil then
+          SaveSettingsLOL()
+          
+          return
+       end
        
        Settings = LoadSettings.MainSettings
        Trinkets = LoadSettings.TrinketSettings
@@ -105,6 +117,10 @@ local ModAlert = function(Name, Role)
 end
 
 LoadSettingsLOL();
+
+local SetColor = Settings["PlayerESP"].Color
+
+Kiriot.Color = Color3.fromRGB(SetColor[1], SetColor[2], SetColor[3]);
 Kiriot:Toggle(true);
 
 local LIB = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
@@ -148,8 +164,8 @@ end)
 
 -- page esp
 
-local PAGE_SECTION_TOGGLES = PAGE_ESP:addSection("TOGGLES")
-local PAGE_SECTION_TRINKET = PAGE_ESP:addSection("TRINKET-SETTINGS")
+local PAGE_SECTION_TOGGLES = PAGE_ESP:addSection("SETTINGS")
+local PAGE_SECTION_CONFIGS = PAGE_ESP:addSection("CONFIG")
 
 PAGE_SECTION_TOGGLES:addToggle("TRINKET ESP", Settings["TrinketESP"], function(value)
    Settings["TrinketESP"] = value
@@ -168,12 +184,27 @@ end)
 
 -- Settings P1 2
 
-for i, v in pairs(Trinkets) do
-   PAGE_SECTION_TRINKET:addToggle(i, Trinkets[i], function(value)
-       Trinkets[i] = value
-       SaveSettingsLOL()
-   end)
-end
+PAGE_SECTION_CONFIGS:addColorPicker("Player-ESP", Color3.fromRGB(SetColor[1], SetColor[2], SetColor[3]), function(value)
+    local Table = Settings["PlayerESP"].Color
+    
+    Table[1] = MakeRGB(value.R)
+    Table[2] = MakeRGB(value.G)
+    Table[3] = MakeRGB(value.B)
+    
+    SaveSettingsLOL()
+    
+    Kiriot.Color = Color3.fromRGB(Table[1], Table[2], Table[3])
+end)
+
+PAGE_SECTION_CONFIGS:addColorPicker("Trinkets-ESP", Color3.fromRGB(Settings["TrinketEspColor"][1], Settings["TrinketEspColor"][2], Settings["TrinketEspColor"][3]), function(value)
+    local Table = Settings["TrinketEspColor"]
+    
+    Table[1] = MakeRGB(value.R)
+    Table[2] = MakeRGB(value.G)
+    Table[3] = MakeRGB(value.B)
+    
+    SaveSettingsLOL()
+end)
 
 local Keys = {W = 0, S = 0, D = 0, A = 0};
 
@@ -253,12 +284,19 @@ RunService.Stepped:Connect(function()
 		                
 		               local TrinketName = v.Parent.Name
 		               local TrinketPart = v.Parent
-		               
+		               local TrinketTab = Settings["TrinketEspColor"]
+		               local TrinketColor = Color3.fromRGB(TrinketTab[1], TrinketTab[2], TrinketTab[3])
 		               --if (Trinkets[TrinketName] == true) then
+                          warn(TrinketColor)
+		                  
 		                  Kiriot:Add(
 		                   TrinketPart,
-		                   {Name = TrinketName}
+		                   {
+		                    Name = TrinketName, 
+		                    Color = TrinketColor
+		                   }
 		                  )
+		                  
 		               --end
 		            end
 		            
@@ -285,6 +323,91 @@ end)
 -- INIT
 
 VEN:SelectPage(VEN.pages[1], true)
+
+-- EXTRA
+
+local Client = Player
+local PlayerGUI = Client:WaitForChild("PlayerGui")
+local Leaderboard = PlayerGUI:WaitForChild("LeaderboardGui")
+local Main = Leaderboard:WaitForChild("MainFrame"):WaitForChild("ScrollingFrame")
+
+local SpectateFunction = function(Label)
+   
+   local Button;
+   local Player;
+   
+   repeat wait() 
+                pcall(function()
+                    Button = Label:FindFirstChild("TextButton")
+                end)
+   until Button ~= nil
+   
+   repeat wait() 
+                pcall(function()
+                    ColorButton = Label:FindFirstChild("ActualPlayerLabel")
+                end)
+   until ColorButton ~= nil   
+   
+   repeat wait()
+                pcall(function(...)
+                    Player = Button.Parent:FindFirstChild("Player").Value
+                end)
+   until Player ~= nil
+   
+   Button.Visible = true
+   Button.Transparency = 1
+   
+   Button.MouseButton1Down:Connect(function(...)
+       local Humanoid;
+       local Count = 0;
+       
+       for i, v in pairs(Main:GetDescendants()) do
+          if v.Name == "PlayerLabel" then
+             v.TextColor3 = Color3.fromRGB(107, 107, 107);
+          end
+          
+          if v.Name == "ActualPlayerLabel" then
+             v.TextColor3 = Color3.fromRGB(255, 255, 255)
+          end
+       end
+       
+       if Client.Character then
+          repeat wait() 
+                       pcall(function()
+                           Count = Count + 1
+                           Humanoid = Client.Character.Humanoid
+                       end)
+          until Humanoid ~= nil or Count > 350
+       end
+       
+       if Humanoid == nil then 
+           return 
+       end
+       
+       if Camera.CameraSubject == Humanoid then
+          if Player == Client then
+             Camera.CameraSubject = Humanoid
+          elseif Player ~= Client then 
+             if Player.Character then
+                if Player.Character:FindFirstChild("Head") then
+                   ColorButton.TextColor3 = Color3.fromRGB(75, 0, 130)
+                   Label.TextColor3 = Color3.fromRGB(75, 0, 130)
+                   
+                   Camera.CameraSubject = Player.Character:FindFirstChild("Head")
+                end
+             end
+          end
+       else
+          Camera.CameraSubject = Humanoid
+       end
+   end)
+end
+
+Main.ChildAdded:Connect(SpectateFunction)
+
+for i, v in pairs(Main:GetChildren()) do
+   SpectateFunction(v)
+end
 
 for i, v in pairs(Players:GetPlayers()) do
    if Check(v) ~= false then

@@ -59,12 +59,6 @@ local LoadSettingsLOL = function()
           return
        end
        
-       if LoadSettings.MainSettings["TrinketESPHolder"] == nil then
-          SaveSettingsLOL()
-          
-          return        
-       end
-       
        Settings = LoadSettings.MainSettings
        Trinkets = LoadSettings.TrinketSettings
    else

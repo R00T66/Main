@@ -13,6 +13,7 @@ local UserInputService = game:GetService("UserInputService");
 local Players = game:GetService("Players")
 
 local Killbricks = {"ArdorianKillbrick", "KillBrick", "Lava", "Killbrickeeee"}
+local TrinketESPHolder = { }
 local Settings = {
  ["TrinketESP"] = true,
  ["TrinketEspColor"] = {255, 170, 0},
@@ -25,6 +26,7 @@ local Settings = {
  ["NoFall"] = false,
  ["RemoveKB"] = false
 }
+local UndetectedMods = {147536033}
 
 local FlyEnabled = false
 local FlySpeed = 40
@@ -57,6 +59,12 @@ local LoadSettingsLOL = function()
           return
        end
        
+       if LoadSettings.MainSettings["TrinketESPHolder"] == nil then
+          SaveSettingsLOL()
+          
+          return        
+       end
+       
        Settings = LoadSettings.MainSettings
        Trinkets = LoadSettings.TrinketSettings
    else
@@ -86,6 +94,12 @@ local Check = function(Player)
        pcall(function()
            Role = Player:GetRoleInGroup(12832629)
        end) 
+       
+       repeat wait() 
+              pcall(function()
+               Role = Player:GetRoleInGroup(12832629)
+           end) 
+       until Role ~= nil
        
        if table.find(AdminRoles, Role:lower()) then return Role:upper() else return false end
     else
@@ -161,6 +175,20 @@ PAGE_SECTION_MISC:addToggle("AUTO-PICKUP", Settings["AutoPickup"], function(valu
     Settings["AutoPickup"] = value
     SaveSettingsLOL()
 end)
+PAGE_SECTION_MISC:addButton("WIPE", function(...)
+    
+    local Humanoid;
+    local Fire = game:GetService("Workspace"):WaitForChild("Fires")
+    
+    if Player.Character then
+       if Player.Character:FindFirstChild("Humanoid") then
+          Humanoid = Player.Character:FindFirstChild("Humanoid")
+       end
+    end
+     
+    if Humanoid ~= nil then Humanoid.Health = 0 end
+end)
+
 
 -- page esp
 
@@ -204,6 +232,16 @@ PAGE_SECTION_CONFIGS:addColorPicker("Trinkets-ESP", Color3.fromRGB(Settings["Tri
     Table[3] = MakeRGB(value.B)
     
     SaveSettingsLOL()
+    
+    local TrinketFolder = workspace.MouseIgnore
+    
+    for i, v in pairs(TrinketESPHolder) do
+       pcall(function() v:Remove() end)
+    end
+
+    for i, v in pairs(TrinketFolder:GetDescendants()) do
+       if v.Name == "TRINKETLOL" then v:Destroy() end
+    end 
 end)
 
 local Keys = {W = 0, S = 0, D = 0, A = 0};
@@ -286,18 +324,16 @@ RunService.Stepped:Connect(function()
 		               local TrinketPart = v.Parent
 		               local TrinketTab = Settings["TrinketEspColor"]
 		               local TrinketColor = Color3.fromRGB(TrinketTab[1], TrinketTab[2], TrinketTab[3])
-		               --if (Trinkets[TrinketName] == true) then
-                          warn(TrinketColor)
-		                  
-		                  Kiriot:Add(
-		                   TrinketPart,
-		                   {
-		                    Name = TrinketName, 
-		                    Color = TrinketColor
-		                   }
-		                  )
-		                  
-		               --end
+
+		               local Box = Kiriot:Add(
+		                TrinketPart,
+		                {
+		                 Name = TrinketName, 
+		                 Color = TrinketColor
+		                }
+		               )
+		                
+		               TrinketESPHolder[#TrinketESPHolder + 1] = Box
 		            end
 		            
 		         end
@@ -403,7 +439,9 @@ local SpectateFunction = function(Label)
    end)
 end
 
-Main.ChildAdded:Connect(SpectateFunction)
+Main.ChildAdded:Connect(function(v)
+    SpectateFunction(v)
+end)
 
 for i, v in pairs(Main:GetChildren()) do
    SpectateFunction(v)
@@ -413,10 +451,18 @@ for i, v in pairs(Players:GetPlayers()) do
    if Check(v) ~= false then
       ModAlert(v.Name, Check(v))
    end
+	
+   if table.find(UndetectedMods, v.UserId) then
+      ModAlert(v.Name, "UNDETECTED MOD")
+   end
 end
 
 Players.PlayerAdded:Connect(function(v)
     if Check(v) ~= false then
        ModAlert(v.Name, Check(v))
     end
+	
+   if table.find(UndetectedMods, v.UserId) then
+      ModAlert(v.Name, "UNDETECTED MOD")
+   end
 end)

@@ -1,3 +1,4 @@
+-- EL2 METAWARE VERSION 2!!!!
 -- Auto Execute Friendly
 
 repeat wait() until game.IsLoaded

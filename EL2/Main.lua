@@ -1,81 +1,353 @@
+-- Auto Execute Friendly
+
 repeat wait() until game.IsLoaded
-repeat wait() until game.Players.LocalPlayer
-repeat wait() until game.Players.LocalPlayer.Character
+repeat wait() until game:GetService("Players").LocalPlayer
+repeat wait() until game:GetService("Players").LocalPlayer.Character
 
-wait(1)
+-- Services
 
-local Kiriot = loadstring(game:HttpGet("https://raw.githubusercontent.com/R00T66/Main/main/EL2/Kiriot22.lua"))(); Kiriot.Boxes = false;
-local Player = game:GetService("Players").LocalPlayer;
-local Camera = workspace.CurrentCamera;
-
-local RunService = game:GetService("RunService");
-local UserInputService = game:GetService("UserInputService");
 local Players = game:GetService("Players")
-
-local Killbricks = {"ArdorianKillbrick", "KillBrick", "Lava", "Killbrickeeee"}
-local TrinketESPHolder = { }
-local Settings = {
- ["TrinketESP"] = true,
- ["TrinketEspColor"] = {255, 170, 0},
- ["PlayerESP"] = {
-     Enabled = true,
-     Color = {75, 0, 130}
- },
- ["AutoPickup"] = false,
- ["EyeESP"] = false,
- ["NoFall"] = false,
- ["RemoveKB"] = false
-}
-local UndetectedMods = {147536033}
-
-local FlyEnabled = false
-local FlySpeed = 40
-local Noclip = false
-
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
-local MakeRGB = function(Number)
-   return math.floor(Number * 255)
-end
-local SaveSettingsLOL = function()
+local StarterGui = game:GetService("StarterGui")
+
+-- Locales
+
+local Client = Players["LocalPlayer"]
+local TrinketFolder = workspace:WaitForChild("MouseIgnore")
+local EyeFolder = workspace:WaitForChild("EyeList")
+local PlayerGUI = Client:WaitForChild("PlayerGui")
+local Leaderboard = PlayerGUI:WaitForChild("LeaderboardGui")
+local Main = Leaderboard:WaitForChild("MainFrame"):WaitForChild("ScrollingFrame")
+local Camera;
+local ESP;
+
+repeat wait() pcall(function() Camera = workspace.CurrentCamera; end) until Camera ~= nil
+
+-- Tables
+
+local Settings = {
+ ["Save"] = {
+  ["ESP"] = {
+   ["Enabled_Player"] = true,
+   ["Enabled_Trinket"] = true,
+   ["Enabled_Eyes"] = true
+  },
+  ["ESP_Settings"] = {
+   ["Color_Player"] = {75, 0, 130}, 
+   ["Color_Trinket"] = {255, 170, 0},
+   ["Color_Eyes"] = {255, 170, 0}
+  },
+  ["Misc"] = {
+   ["AP"] = false,
+   ["RKB"] = false,
+   ["NF"] = false
+  } 
+ },
+ ["General"] = {
+  ["Flying"] = false,
+  ["Speed"] = false,
+  ["Noclip"] = false,
+  ["Flyspeed"] = 40,
+  ["WalkSpeed"] = 50,
+ },
+ ["Information"] = {
+  ["MODS"] = {
+   ["UNDETECTED"] = {147536033},
+   ["ROLES"] = {"admin", "god", "dev", "owner"}
+  },
+  ["KILLBRICKS"] = {
+   "ArdorianKillbrick", 
+   "KillBrick", 
+   "Lava", 
+   "Killbrickeeee"
+  },
+  ["BOX_HOLDER"] = {
+   ["Trinkets"] = { },
+   ["Eyes"] = { }
+  }
+ }
+}
+local Keys = {
+    W = 0, 
+    S = 0, 
+    A = 0, 
+    D = 0
+}
+
+-- Assets
+
+local KBHolder = Instance.new("Folder");
+
+-- Settings Functions
+
+local SaveFile = "EL2.Settings"
+
+local Save_Settings = function()
    writefile("EL2.Settings", HttpService:JSONEncode({
-      MainSettings = Settings,
-      TrinketSettings = Trinkets
+      Settings = Settings["Save"]
    }))
 end
-local LoadSettingsLOL = function()
-   if isfile("EL2.Settings") then
-       
-       local LoadSettings = HttpService:JSONDecode(readfile("EL2.Settings"))
-       
-       if LoadSettings.MainSettings["PlayerESP"].Color == nil then
-          SaveSettingsLOL()
-          
-          return
-       end
-       
-       if LoadSettings.MainSettings["TrinketEspColor"] == nil then
-          SaveSettingsLOL()
-          
-          return
-       end
-       
-       Settings = LoadSettings.MainSettings
-       Trinkets = LoadSettings.TrinketSettings
+local Load_Settings = function()
+   if isfile(SaveFile) then
+
+      local Contents;
+      local Success, Error = pcall(function()
+          Contents = HttpService:JSONDecode(readfile(SaveFile)).Settings
+      end)
+   
+      if not Success or Contents == nil then
+         
+         writefile(SaveFile, HttpService:JSONEncode({
+            Settings = Settings["Save"]
+         }))
+
+         return
+      end
+
+      if Contents ~= nil then
+	 if Contents["MainSettings"] ~= nil then
+	    Save_Settings()
+	
+	    StarterGui:SetCore("SendNotification", {Title = "WELCOME", Text = "Welcome to META WARE V2!", Duration = 15})
+	    return
+	 end
+			
+         if Contents["Misc"] == nil then
+            Save_Settings()
+            
+	    StarterGui:SetCore("SendNotification", {Title = "ERROR", Text = "INVALID SETTINGS! They have been reset.", Duration = 30})
+            return
+         end
+      end 
+ 
+      if Success then
+         Settings["Save"] = Contents
+      end
    else
       writefile("EL2.Settings", HttpService:JSONEncode({
-         MainSettings = Settings,
-         TrinketSettings = Trinkets
-      }))     
+         Settings = Settings["Save"]
+      }))
    end
 end
-local KillbrickHolder = Instance.new("Folder")
-local KB = function(value)
-   if not value then for i, v in pairs(KillbrickHolder:GetChildren()) do v.Parent = workspace end end
-   if value then for i, v in pairs(workspace:GetDescendants()) do if table.find(Killbricks, v.Name) then
-          v.Parent = KillbrickHolder
-   end end end
+
+-- Functions
+
+local SKB = function(Value)
+   if Value then
+      for i, v in pairs(workspace:GetDescendants()) do
+         if table.find(Settings["Information"]["KILLBRICKS"], v.Name) then
+            
+	        local Obj = Instance.new("ObjectValue", v);
+	        Obj.Name = "OriginalParent"
+            Obj.Value = v.Parent; 
+
+            v.Parent = KBHolder
+         end 
+      end
+   else
+      for i, v in pairs(KBHolder:GetChildren()) do
+         v.Parent = v:FindFirstChild("OriginalParent").Value;
+         v:FindFirstChild("OriginalParent"):Destroy()
+      end
+   end
 end
-local AdminRoles = {"admin", "dev", "god", "owner"}
+local SMA = function(Name, Role)
+   local BindableFunction = Instance.new("BindableFunction")
+
+   BindableFunction.OnInvoke = function(Text)
+      if Text:lower() == "ok" then
+          return
+      else
+	    Client:Kick("\n[HOPPING]"); wait(1);
+          loadstring(game:HttpGet("https://raw.githubusercontent.com/R00T66/Main/main/EL2/Hop.lua"))()
+      end
+   end
+
+   StarterGui:SetCore("SendNotification", {
+     Title = "MOD ALERT",
+     Text = Name .. " [ " .. Role .. " ]",
+     Button1 = "OK",
+     Button2 = "SERVER HOP",
+     Duration = 3000000,
+     Callback = BindableFunction
+   })   
+end
+local MRGB = function(Number)
+   return math.floor(Number * 255)
+end
+local UpdateFlight = function()
+    if (Client.Character and Client.Character:FindFirstChild("HumanoidRootPart")) then 
+        Dir = (Camera.CFrame.RightVector * (Keys.D - Keys.A) + Camera.CFrame.LookVector * (Keys.W - Keys.S));
+        Client.Character.HumanoidRootPart.Velocity = (Dir * Settings["General"]["Flyspeed"]);
+    end;
+end
+local FlyIB = function(inp, g)
+    if g then return end
+    
+    if (inp.KeyCode == Enum.KeyCode.W) then 
+        Keys.W = 1
+    end;
+    if (inp.KeyCode == Enum.KeyCode.A) then 
+        Keys.A = 1
+    end;
+    if (inp.KeyCode == Enum.KeyCode.S) then 
+        Keys.S = 1
+    end;
+    if (inp.KeyCode == Enum.KeyCode.D) then 
+        Keys.D = 1
+    end;
+end
+local FlyIE = function(inp, g)
+    if g then return end
+    
+    if (inp.KeyCode == Enum.KeyCode.W) then 
+        Keys.W = 0
+    end;
+    if (inp.KeyCode == Enum.KeyCode.A) then 
+        Keys.A = 0
+    end;
+    if (inp.KeyCode == Enum.KeyCode.S) then 
+        Keys.S = 0
+    end;
+    if (inp.KeyCode == Enum.KeyCode.D) then 
+        Keys.D = 0
+    end;
+end
+local MainService = function(...)
+   
+   local Noclip = Settings["General"]["Noclip"]
+   local Flying = Settings["General"]["Flying"]
+   local TrnktT = Settings["Save"]["ESP_Settings"]["Color_Trinket"] 
+   local TrnktH = Settings["Information"]["BOX_HOLDER"]["Trinkets"]
+   local EyeCOL = Settings["Save"]["ESP_Settings"]["Color_Eyes"] 
+   local EyeHOL = Settings["Information"]["BOX_HOLDER"]["Eyes"]
+   local AutoPI = Settings["Save"]["Misc"]["AP"]
+   local TriESP = Settings["Save"]["ESP"]["Enabled_Trinket"]
+
+   if (Noclip == true and Client.Character) then
+	for i,v in pairs(Client.Character:GetDescendants()) do
+	   if (v:IsA("BasePart")) then v.CanCollide = false end
+	end
+   end
+
+   if (Flying == true and Client.Character and Client.Character:FindFirstChild("Torso") and Client.Character:FindFirstChild("HumanoidRootPart")) then 
+      UpdateFlight()
+   end
+
+   if Client.Character then
+      if Client.Character:FindFirstChild("Humanoid") then
+         if Settings["General"]["Speed"] then
+             setscriptable(
+              game.Players.LocalPlayer.Character.Humanoid, 
+              "WalkSpeed", 
+              false
+             )
+             sethiddenproperty(
+              game.Players.LocalPlayer.Character.Humanoid, 
+              "WalkSpeed", 
+              Settings["General"]["WalkSpeed"]
+             )
+         elseif gethiddenproperty(game.Players.LocalPlayer.Character.Humanoid, "WalkSpeed") == Settings["General"]["WalkSpeed"] then
+             sethiddenproperty(
+              game.Players.LocalPlayer.Character.Humanoid, 
+              "WalkSpeed", 
+              16
+             )
+             setscriptable(
+              game.Players.LocalPlayer.Character.Humanoid, 
+              "WalkSpeed", 
+              true
+             )
+         end
+      end
+      for i, v in pairs(TrinketFolder:GetDescendants()) do
+         if v:IsA("ClickDetector") and (AutoPI or TriESP) then
+            
+            local TrinketPart = v.Parent
+            local TrinketName = TrinketPart.Parent.Name
+            local TrinketColor = Color3.fromRGB(TrnktT[1], TrnktT[2], TrnktT[3])
+
+            if AutoPI then
+               if Client.Character:FindFirstChild("HumanoidRootPart") then
+                  
+                  local Root = Client.Character:FindFirstChild("HumanoidRootPart")
+
+                  if (Root.Position - TrinketPart.Position).magnitude < 25 then
+                     fireclickdetector(v)
+                  end
+               end
+            end
+
+            if not v:FindFirstChild("TrinketLol") and TriESP then            
+               Instance.new("BoolValue", v).Name = "TrinketLol"
+               
+               local Box = ESP:Add(TrinketPart, {
+                 Name = TrinketName,
+                 Color = TrinketColor
+               })
+
+               TrnktH[#TrnktH + 1] = Box
+            end
+         end
+      end
+
+      for i, v in pairs(EyeFolder:GetDescendants()) do
+         if v:IsA("ClickDetector") and Settings["Save"]["ESP"]["Enabled_Eyes"] then
+                
+            local Model = v.Parent
+            local PrimaryPart;
+
+            if Model:FindFirstChild("Part") then
+               PrimaryPart = Model:FindFirstChild("Part")
+            end
+
+
+            if Model:FindFirstChild("Union") then
+               PrimaryPart = Model:FindFirstChild("Union")
+            end
+
+            if PrimaryPart ~= nil then
+               if PrimaryPart.Transparency == 0 then
+                  if not v:FindFirstChild("EyeLol") then
+                     local Tag = Instance.new("BoolValue", v)
+                     Tag.Name = "EyeLol"
+
+                     local Box = ESP:Add(PrimaryPart, {
+                       Name = Model.Name:upper() .. " EYE",
+                       Color = Color3.fromRGB(EyeCOL[1], EyeCOL[2], EyeCOL[3])
+                     })
+                     
+                     table.insert(EyeHOL, Box)
+
+                     local Signal;
+
+                     Signal = PrimaryPart:GetPropertyChangedSignal("Transparency"):Connect(function(...)
+                         if PrimaryPart.Transparency ~= 0 then
+                            Box:Remove()
+                            Signal:Disconnect()
+                         end
+                     end)
+                  end
+               end
+            end
+         end
+      end
+   end
+end
+local Hook;
+local MainHook = function(self, ...)
+   local Method = getnamecallmethod()
+
+   if Method == "FireServer" then
+      if self.Parent.Name == "FallDamage" then
+         return
+      end
+   end
+
+   return Hook(self, ...)
+end
 local Check = function(Player)
     local InGroup;
     local Role;
@@ -95,272 +367,20 @@ local Check = function(Player)
            end) 
        until Role ~= nil
        
-       if table.find(AdminRoles, Role:lower()) then return Role:upper() else return false end
+       if table.find(Settings["Information"]["MODS"]["ROLES"], Role:lower()) then return Role:upper() else return false end
     else
        return false
     end
 end
-local ModAlert = function(Name, Role)
-    
-   local Func = Instance.new("BindableFunction")
-   
-   Func.OnInvoke = function(Text)
-       if Text == "OK" then 
-	       return
-	    else
-	       Player:Kick("\n[HOPPING]")
-	       wait(1)
-           loadstring(game:HttpGet("https://raw.githubusercontent.com/R00T66/Main/main/EL2/Hop.lua"))()
-       end
+local MainCheck = function(Player)
+   if Check(Player) ~= false then
+      SMA(Player, Check(Player))
    end
    
-   game:GetService("StarterGui"):SetCore("SendNotification", {
-     Title = "MOD ALERT",
-     Text = Name .. " [ " .. Role .. " ]",
-     Button1 = "OK",
-     Button2 = "HOP",
-     Duration = 3000000,
-     Callback = Func
-   })
+   if table.find(Settings["Information"]["MODS"]["UNDETECTED"], Player.userId) then
+      SMA(Player, "SILENT")
+   end
 end
-
-LoadSettingsLOL();
-
-local SetColor = Settings["PlayerESP"].Color
-
-Kiriot.Color = Color3.fromRGB(SetColor[1], SetColor[2], SetColor[3]);
-Kiriot:Toggle(true);
-
-local LIB = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
-local VEN = LIB.new("META-WARE [EL2]", 5013109572)
-
-local PAGE_MAIN = VEN:addPage("MAIN", 5012544693)
-local PAGE_ESP = VEN:addPage("ESP", 5012544693)
-
--- page main
-
-local PAGE_SECTION_MOVEMENT = PAGE_MAIN:addSection("MOVEMENT")
-local PAGE_SECTION_MOVEMENTSETTINGS = PAGE_MAIN:addSection("MOVEMENT-SETTINGS")
-local PAGE_SECTION_MISC = PAGE_MAIN:addSection("MISC")
-
-PAGE_SECTION_MOVEMENT:addToggle("FLY", false, function(value)
-    FlyEnabled = value
-end)
-PAGE_SECTION_MOVEMENT:addToggle("NOCLIP", false, function(value)
-    Noclip = value
-end)
-PAGE_SECTION_MOVEMENT:addToggle("NO-FALL", Settings["NoFall"], function(value)
-    Settings["NoFall"] = value
-    SaveSettingsLOL()
-end)
-
-PAGE_SECTION_MOVEMENTSETTINGS:addSlider("FLY-SPEED", 40, 1, 100, function(value)
-    FlySpeed = value
-end)
-
-PAGE_SECTION_MISC:addToggle("REMOVE-KILLBRICKS", Settings["RemoveKB"], function(value)
-    Settings["RemoveKB"] = value
-    KB(value)
-    SaveSettingsLOL()
-end)
-
-
-PAGE_SECTION_MISC:addToggle("AUTO-PICKUP", Settings["AutoPickup"], function(value)
-    Settings["AutoPickup"] = value
-    SaveSettingsLOL()
-end)
-PAGE_SECTION_MISC:addButton("WIPE", function(...)
-    
-    local Humanoid;
-    local Fire = game:GetService("Workspace"):WaitForChild("Fires")
-    
-    if Player.Character then
-       if Player.Character:FindFirstChild("Humanoid") then
-          Humanoid = Player.Character:FindFirstChild("Humanoid")
-       end
-    end
-     
-    if Humanoid ~= nil then Humanoid.Health = 0 end
-end)
-
-
--- page esp
-
-local PAGE_SECTION_TOGGLES = PAGE_ESP:addSection("SETTINGS")
-local PAGE_SECTION_CONFIGS = PAGE_ESP:addSection("CONFIG")
-
-PAGE_SECTION_TOGGLES:addToggle("TRINKET ESP", Settings["TrinketESP"], function(value)
-   Settings["TrinketESP"] = value
-   SaveSettingsLOL()
-end)
-PAGE_SECTION_TOGGLES:addToggle("EYE ESP", Settings["EyeESP"], function(value)
-   Settings["EyeESP"].Enabled = value
-   Kiriot:Toggle(value)
-   SaveSettingsLOL()
-end)
-PAGE_SECTION_TOGGLES:addToggle("PLAYER ESP", Settings["PlayerESP"], function(value)
-   Settings["PlayerESP"].Enabled = value
-   Kiriot.Players = value
-   SaveSettingsLOL()
-end)
-
--- Settings P1 2
-
-PAGE_SECTION_CONFIGS:addColorPicker("Player-ESP", Color3.fromRGB(SetColor[1], SetColor[2], SetColor[3]), function(value)
-    local Table = Settings["PlayerESP"].Color
-    
-    Table[1] = MakeRGB(value.R)
-    Table[2] = MakeRGB(value.G)
-    Table[3] = MakeRGB(value.B)
-    
-    SaveSettingsLOL()
-    
-    Kiriot.Color = Color3.fromRGB(Table[1], Table[2], Table[3])
-end)
-
-PAGE_SECTION_CONFIGS:addColorPicker("Trinkets-ESP", Color3.fromRGB(Settings["TrinketEspColor"][1], Settings["TrinketEspColor"][2], Settings["TrinketEspColor"][3]), function(value)
-    local Table = Settings["TrinketEspColor"]
-    
-    Table[1] = MakeRGB(value.R)
-    Table[2] = MakeRGB(value.G)
-    Table[3] = MakeRGB(value.B)
-    
-    SaveSettingsLOL()
-    
-    local TrinketFolder = workspace.MouseIgnore
-    
-    for i, v in pairs(TrinketESPHolder) do
-       pcall(function() v:Remove() end)
-    end
-
-    for i, v in pairs(TrinketFolder:GetDescendants()) do
-       if v.Name == "TRINKETLOL" then v:Destroy() end
-    end 
-end)
-
-local Keys = {W = 0, S = 0, D = 0, A = 0};
-
-local function UpdateFlight()
-    if (Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")) then 
-        Dir = (Camera.CFrame.RightVector * (Keys.D - Keys.A) + Camera.CFrame.LookVector * (Keys.W - Keys.S));
-        Player.Character.HumanoidRootPart.Velocity = (Dir * FlySpeed);
-    end;
-end;
-
-UserInputService.InputBegan:Connect(function(inp, g)
-    
-    if g then return end
-    
-    if (inp.KeyCode == Enum.KeyCode.W) then 
-        Keys.W = 1;
-    end;
-    if (inp.KeyCode == Enum.KeyCode.A) then 
-        Keys.A = 1;
-    end;
-    if (inp.KeyCode == Enum.KeyCode.S) then 
-        Keys.S = 1;
-    end;
-    if (inp.KeyCode == Enum.KeyCode.D) then 
-        Keys.D = 1;
-    end;
-end)
-
-UserInputService.InputEnded:Connect(function(inp, g)
-    
-    if g then return end
-    
-    if (inp.KeyCode == Enum.KeyCode.W) then 
-        Keys.W = 0;
-    end;
-    if (inp.KeyCode == Enum.KeyCode.A) then 
-        Keys.A = 0;
-    end;
-    if (inp.KeyCode == Enum.KeyCode.S) then 
-        Keys.S = 0;
-    end;
-    if (inp.KeyCode == Enum.KeyCode.D) then 
-        Keys.D = 0;
-    end;
-end)
-
-RunService.Stepped:Connect(function()
-    if (Noclip == true and Player.Character) then
-		for i,v in pairs(Player.Character:GetDescendants()) do
-			if (v:IsA('BasePart')) then v.CanCollide = false; end;
-	    end;
-    end;
-
-    if (FlyEnabled == true and Player.Character and Player.Character:FindFirstChild("Torso") and Player.Character:FindFirstChild("HumanoidRootPart")) then 
-        UpdateFlight();
-    end;
-    	if (Player.Character) then
-		if Player.Character:FindFirstChild("HumanoidRootPart") then
-		   
-		   local TrinketFolder = workspace.MouseIgnore
-		   
-		   for i, v in pairs(TrinketFolder:GetDescendants()) do
-		      if v.Name == "ClickPart" then
-		       
-		         if (Settings["AutoPickup"] == true) then
-		            if (v.Position - Player.Character:FindFirstChild("HumanoidRootPart").Position).magnitude < 25 then
-		               if v:FindFirstChildOfClass("ClickDetector") then
-		                  fireclickdetector(v:FindFirstChildOfClass("ClickDetector"))
-		               end
-		            end
-		         end
-	            
-		         if not v:FindFirstChild("TRINKETLOL") then
-		            Instance.new("Folder", v).Name = "TRINKETLOL"
-		            
-		            if (Settings["TrinketESP"] == true) then
-		                
-		               local TrinketName = v.Parent.Name
-		               local TrinketPart = v.Parent
-		               local TrinketTab = Settings["TrinketEspColor"]
-		               local TrinketColor = Color3.fromRGB(TrinketTab[1], TrinketTab[2], TrinketTab[3])
-
-		               local Box = Kiriot:Add(
-		                TrinketPart,
-		                {
-		                 Name = TrinketName, 
-		                 Color = TrinketColor
-		                }
-		               )
-		                
-		               TrinketESPHolder[#TrinketESPHolder + 1] = Box
-		            end
-		            
-		         end
-		      end
-		   end
-		end
-	end;
-end)
-local HKS;
-
-HKS = hookmetamethod(game, "__namecall", function(self, ...)
-    local method = getnamecallmethod()
-    
-    if method == ("FireServer") then
-       if (Settings["NoFall"] == true and self.Parent.Name == ("FallDamage")) then
-          return;
-       end
-    end
-    
-    return HKS(self, ...)
-end)
-
--- INIT
-
-VEN:SelectPage(VEN.pages[1], true)
-
--- EXTRA
-
-local Client = Player
-local PlayerGUI = Client:WaitForChild("PlayerGui")
-local Leaderboard = PlayerGUI:WaitForChild("LeaderboardGui")
-local Main = Leaderboard:WaitForChild("MainFrame"):WaitForChild("ScrollingFrame")
-
 local SpectateFunction = function(Label)
    
    local Button;
@@ -433,30 +453,197 @@ local SpectateFunction = function(Label)
    end)
 end
 
-Main.ChildAdded:Connect(function(v)
-    SpectateFunction(v)
+-- Setup
+
+Load_Settings();
+
+local PlayerColor = Settings["Save"]["ESP_Settings"]["Color_Player"]
+
+ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/R00T66/Main/main/EL2/Kiriot22.lua"))();
+ESP.Boxes = false;
+ESP.Tracers = false;
+ESP.Color = Color3.fromRGB(PlayerColor[1], PlayerColor[2], PlayerColor[3])
+
+ESP:Toggle(true)
+
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
+local GUIPage = Library.new("META WARE [ EL2 ]", 5013109572)
+
+local MAIN = GUIPage:addPage("MAIN")
+local ESP = GUIPage:addPage("ESP")
+
+local MAIN_MOVEMENT = MAIN:addSection("MOVEMENT")
+local MAIN_MSETTINGS = MAIN:addSection("MOVEMENT SETTINGS")
+local MAIN_MISC = MAIN:addSection("MISC")
+local MAIN_GENERAL_TABLE = Settings["General"]
+local MAIN_MISC_TABLE = Settings["Save"]["Misc"]
+
+local ESP_ENABLE = ESP:addSection("TOGGLE")
+local ESP_SETTINGS = ESP:addSection("SETTINGS")
+local ESP_ENABLE_TABLE = Settings["Save"]["ESP"]
+local ESP_COLOR_TABLE = Settings["Save"]["ESP_Settings"]
+
+-- MOVEMENT
+
+local FlyToggle = MAIN_MOVEMENT:addToggle("FLY", false, function(Value)
+    MAIN_GENERAL_TABLE["Flying"] = Value
 end)
 
-for i, v in pairs(Main:GetChildren()) do
-   SpectateFunction(v)
-end
+local NoclipToggle = MAIN_MOVEMENT:addToggle("NOCLIP", false, function(Value)
+    MAIN_GENERAL_TABLE["Noclip"] = Value
+end)
 
-for i, v in pairs(Players:GetPlayers()) do
-   if Check(v) ~= false then
-      ModAlert(v.Name, Check(v))
-   end
-	
-   if table.find(UndetectedMods, v.UserId) then
-      ModAlert(v.Name, "UNDETECTED MOD")
-   end
-end
+local SpeedToggle = MAIN_MOVEMENT:addToggle("SPEED", false, function(Value)
+    MAIN_GENERAL_TABLE["Speed"] = Value
+end)
 
-Players.PlayerAdded:Connect(function(v)
-    if Check(v) ~= false then
-       ModAlert(v.Name, Check(v))
+-- MOVEMENT SETTINGS
+
+local FlySpeed = MAIN_MSETTINGS:addSlider("FLY SPEED", 60, 10, 100, function(Value)
+    MAIN_GENERAL_TABLE["Flyspeed"] = Value
+end)
+
+local WSSpeed = MAIN_MSETTINGS:addSlider("WALK SPEED", 60, 10, 100, function(Value)
+    MAIN_GENERAL_TABLE["WalkSpeed"] = Value
+end)
+
+-- MISC
+
+local AP = MAIN_MISC:addToggle("AUTO PICKUP", Settings["Save"]["Misc"]["AP"], function(Value)
+    MAIN_MISC_TABLE["AP"] = Value
+    Save_Settings()
+end)
+
+local NF = MAIN_MISC:addToggle("NO FALL", Settings["Save"]["Misc"]["AP"], function(Value)
+    MAIN_MISC_TABLE["NF"] = Value
+    Save_Settings()
+end)
+
+local NF = MAIN_MISC:addToggle("REMOVE KILLBRICKS", Settings["Save"]["Misc"]["RKB"], function(Value)
+    MAIN_MISC_TABLE["RKB"] = Value
+    SKB(Value)
+    Save_Settings()
+end)
+
+-- ENABLES
+
+ESP_ENABLE:addToggle("Players", ESP_ENABLE_TABLE["Enabled_Player"], function(Value)
+    ESP_ENABLE_TABLE["Enabled_Player"] = Value
+    Save_Settings()
+end)
+
+ESP_ENABLE:addToggle("Trinkets", ESP_ENABLE_TABLE["Enabled_Trinket"], function(Value)
+    ESP_ENABLE_TABLE["Enabled_Trinket"] = Value
+    
+    Save_Settings()
+    
+    for i, v in pairs(Settings["Information"]["BOX_HOLDER"]["Trinkets"]) do
+       if v ~= nil then v:Remove() end
     end
-	
-   if table.find(UndetectedMods, v.UserId) then
-      ModAlert(v.Name, "UNDETECTED MOD")
-   end
+    
+    for i, v in pairs(TrinketFolder:GetDescendants()) do
+       if v.Name == "TrinketLol" then
+          v:Destroy()
+       end
+    end
 end)
+
+ESP_ENABLE:addToggle("Eyes", ESP_ENABLE_TABLE["Enabled_Eyes"], function(Value)
+    ESP_ENABLE_TABLE["Enabled_Eyes"] = Value
+
+    Save_Settings()
+    
+    for i, v in pairs(Settings["Information"]["BOX_HOLDER"]["Eyes"]) do
+       if v ~= nil then v:Remove() end
+    end
+    
+    for i, v in pairs(EyeFolder:GetDescendants()) do
+       if v.Name == "EyeLol" then
+          v:Destroy()
+       end
+    end
+end)
+
+-- ESP SETTINGS
+
+local PLRColor = ESP_COLOR_TABLE["Color_Player"]
+local TRNColor = ESP_COLOR_TABLE["Color_Trinket"]
+local EYEColor = ESP_COLOR_TABLE["Color_Eyes"]
+
+ESP_SETTINGS:addColorPicker("PLAYER COLOR", Color3.fromRGB(PLRColor[1], PLRColor[2], PLRColor[3]), function(Value)
+    ESP_COLOR_TABLE["Color_Player"][1] = MRGB(Value.R)
+    ESP_COLOR_TABLE["Color_Player"][2] = MRGB(Value.G)
+    ESP_COLOR_TABLE["Color_Player"][3] = MRGB(Value.B)
+    
+    ESP.Color = Color3.fromRGB(ESP_COLOR_TABLE["Color_Player"][1], ESP_COLOR_TABLE["Color_Player"][2], ESP_COLOR_TABLE["Color_Player"][3])
+    Save_Settings()
+end)
+
+ESP_SETTINGS:addColorPicker("TRINKET COLOR", Color3.fromRGB(TRNColor[1], TRNColor[2], TRNColor[3]), function(Value)
+    ESP_COLOR_TABLE["Color_Trinket"][1] = MRGB(Value.R)
+    ESP_COLOR_TABLE["Color_Trinket"][2] = MRGB(Value.G)
+    ESP_COLOR_TABLE["Color_Trinket"][3] = MRGB(Value.B) 
+    
+    Save_Settings()
+    
+    for i, v in pairs(Settings["Information"]["BOX_HOLDER"]["Trinkets"]) do
+       if v ~= nil then v:Remove() end
+    end
+    
+    for i, v in pairs(TrinketFolder:GetDescendants()) do
+       if v.Name == "TrinketLol" then
+          v:Destroy()
+       end
+    end
+end)
+
+ESP_SETTINGS:addColorPicker("EYES COLOR", Color3.fromRGB(EYEColor[1], EYEColor[2], EYEColor[3]), function(Value)
+    ESP_COLOR_TABLE["Color_Eyes"][1] = MRGB(Value.R)
+    ESP_COLOR_TABLE["Color_Eyes"][2] = MRGB(Value.G)
+    ESP_COLOR_TABLE["Color_Eyes"][3] = MRGB(Value.B) 
+
+    Save_Settings()
+    
+    for i, v in pairs(Settings["Information"]["BOX_HOLDER"]["Eyes"]) do
+       if v ~= nil then v:Remove() end
+    end
+    
+    for i, v in pairs(EyeFolder:GetDescendants()) do
+       if v.Name == "EyeLol" then
+          v:Destroy()
+       end
+    end
+end)
+
+-- Connects
+
+wait(4)
+
+RunService.Stepped:Connect(MainService);
+UserInputService.InputBegan:Connect(FlyIB);
+UserInputService.InputEnded:Connect(FlyIE);
+Players.PlayerAdded:Connect(MainCheck);
+SKB(Settings["Save"]["Misc"]["RKB"]);
+Main.ChildAdded:Connect(SpectateFunction);
+
+coroutine.resume(
+ coroutine.create(
+  function()
+     for i, v in pairs(Main:GetChildren()) do SpectateFunction(v) end
+     for i, v in pairs(Players:GetPlayers()) do MainCheck(v) end   
+  end
+ )
+)
+-- Hooks
+
+Hook = hookmetamethod(game, "__namecall", MainHook)
+
+-- FINALIZE
+
+GUIPage:SelectPage(GUIPage.pages[1], true)
+
+StarterGui:SetCore("SendNotification", {
+  Title = "ALERT",
+  Text = "SCRIPT FULLY LOADED",
+  Duration = 10
+})

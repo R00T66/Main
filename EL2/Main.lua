@@ -216,83 +216,66 @@ local FlyIE = function(inp, g)
         Keys.D = 0
     end;
 end
+local FullyLoaded = false
+local SecondService = function(...)
+ 
+   local Noclip = Settings["General"]["Noclip"]
+   
+   if (Noclip == true and FullyLoaded and Client.Character) then
+	  for i,v in pairs(Client.Character:GetDescendants()) do
+	     if (v:IsA("BasePart")) then v.CanCollide = false end
+	  end
+   end
+end
 local MainService = function(...)
    
-   local Noclip = Settings["General"]["Noclip"]
-   local Flying = Settings["General"]["Flying"]
    local TrnktT = Settings["Save"]["ESP_Settings"]["Color_Trinket"] 
    local TrnktH = Settings["Information"]["BOX_HOLDER"]["Trinkets"]
    local EyeCOL = Settings["Save"]["ESP_Settings"]["Color_Eyes"] 
    local EyeHOL = Settings["Information"]["BOX_HOLDER"]["Eyes"]
    local AutoPI = Settings["Save"]["Misc"]["AP"]
    local TriESP = Settings["Save"]["ESP"]["Enabled_Trinket"]
-
-   if (Noclip == true and Client.Character) then
-	for i,v in pairs(Client.Character:GetDescendants()) do
-	   if (v:IsA("BasePart")) then v.CanCollide = false end
-	end
-   end
+   local Flying = Settings["General"]["Flying"]
 
    if (Flying == true and Client.Character and Client.Character:FindFirstChild("Torso") and Client.Character:FindFirstChild("HumanoidRootPart")) then 
       UpdateFlight()
    end
-
-   if Client.Character then
-      if Client.Character:FindFirstChild("Humanoid") then
-         if Settings["General"]["Speed"] then
-             setscriptable(
-              game.Players.LocalPlayer.Character.Humanoid, 
-              "WalkSpeed", 
-              false
-             )
-             sethiddenproperty(
-              game.Players.LocalPlayer.Character.Humanoid, 
-              "WalkSpeed", 
-              Settings["General"]["WalkSpeed"]
-             )
-         elseif gethiddenproperty(game.Players.LocalPlayer.Character.Humanoid, "WalkSpeed") == Settings["General"]["WalkSpeed"] then
-             sethiddenproperty(
-              game.Players.LocalPlayer.Character.Humanoid, 
-              "WalkSpeed", 
-              16
-             )
-             setscriptable(
-              game.Players.LocalPlayer.Character.Humanoid, 
-              "WalkSpeed", 
-              true
-             )
-         end
-      end
-      for i, v in pairs(TrinketFolder:GetDescendants()) do
-         if v:IsA("ClickDetector") and (AutoPI or TriESP) then
+   
+   for i, v in pairs(TrinketFolder:GetChildren()) do
+     if (AutoPI or TriESP) then
+          
+      if (v:GetChildren()[1] ~= nil and v:GetChildren()[1]:FindFirstChild("ClickPart")) then
             
-            local TrinketPart = v.Parent
-            local TrinketName = TrinketPart.Parent.Name
-            local TrinketColor = Color3.fromRGB(TrnktT[1], TrnktT[2], TrnktT[3])
-
-            if AutoPI then
-               if Client.Character:FindFirstChild("HumanoidRootPart") then
+         local v = v:GetChildren()[1]:FindFirstChild("ClickPart"):WaitForChild("Clicker")
+         local TrinketPart = v.Parent
+         local TrinketName = TrinketPart.Parent.Name
+         local TrinketColor = Color3.fromRGB(TrnktT[1], TrnktT[2], TrnktT[3])
+ 
+          
+         if AutoPI then
+            if Client.Character:FindFirstChild("HumanoidRootPart") then
                   
-                  local Root = Client.Character:FindFirstChild("HumanoidRootPart")
+               local Root = Client.Character:FindFirstChild("HumanoidRootPart")
 
-                  if (Root.Position - TrinketPart.Position).magnitude < 25 then
-                     fireclickdetector(v)
-                  end
+               if (Root.Position - TrinketPart.Position).magnitude < 25 then
+                  fireclickdetector(v)
                end
             end
+         end
 
-            if not v:FindFirstChild("TrinketLol") and TriESP then            
-               Instance.new("BoolValue", v).Name = "TrinketLol"
+         if not v:FindFirstChild("TrinketLol") and TriESP then            
+            Instance.new("BoolValue", v).Name = "TrinketLol"
                
-               local Box = ESP:Add(TrinketPart, {
-                 Name = TrinketName,
-                 Color = TrinketColor
-               })
+            local Box = ESP:Add(TrinketPart, {
+              Name = TrinketName,
+              Color = TrinketColor
+            })
 
-               TrnktH[#TrnktH + 1] = Box
-            end
+            TrnktH[#TrnktH + 1] = Box
          end
       end
+   end
+end
 
       for i, v in pairs(EyeFolder:GetDescendants()) do
          if v:IsA("ClickDetector") and Settings["Save"]["ESP"]["Enabled_Eyes"] then
@@ -336,7 +319,7 @@ local MainService = function(...)
          end
       end
    end
-end
+
 local Hook;
 local MainHook = function(self, ...)
    local Method = getnamecallmethod()
@@ -618,9 +601,8 @@ end)
 
 -- Connects
 
-wait(4)
-
-RunService.Stepped:Connect(MainService);
+RunService.Stepped:Connect(SecondService);
+RunService.RenderStepped:Connect(MainService);
 UserInputService.InputBegan:Connect(FlyIB);
 UserInputService.InputEnded:Connect(FlyIE);
 Players.PlayerAdded:Connect(MainCheck);
@@ -630,11 +612,25 @@ Main.ChildAdded:Connect(SpectateFunction);
 coroutine.resume(
  coroutine.create(
   function()
-     for i, v in pairs(Main:GetChildren()) do SpectateFunction(v) end
-     for i, v in pairs(Players:GetPlayers()) do MainCheck(v) end   
+      
+     pcall(function(...)
+         for i, v in pairs(Main:GetChildren()) do SpectateFunction(v) end
+         for i, v in pairs(Players:GetPlayers()) do MainCheck(v) end   
+     end)
+     
+     wait(1)
+     
+     FullyLoaded = true
+     
+     StarterGui:SetCore("SendNotification", {
+       Title = "INFO",
+       Text = "SCRIPT FULLY LOADED",
+       Duration = 10
+     })
   end
  )
 )
+
 -- Hooks
 
 Hook = hookmetamethod(game, "__namecall", MainHook)
@@ -642,9 +638,3 @@ Hook = hookmetamethod(game, "__namecall", MainHook)
 -- FINALIZE
 
 GUIPage:SelectPage(GUIPage.pages[1], true)
-
-StarterGui:SetCore("SendNotification", {
-  Title = "ALERT",
-  Text = "SCRIPT FULLY LOADED",
-  Duration = 10
-})

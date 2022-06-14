@@ -154,21 +154,21 @@ local SKB = function(Value)
       end
    end
 end
-local SMA = function(Name, Role)
+local SMA = function(Player, Role)
    local BindableFunction = Instance.new("BindableFunction")
-
+   
    BindableFunction.OnInvoke = function(Text)
       if Text:lower() == "ok" then
           return
       else
-	    Client:Kick("\n[HOPPING]"); wait(1);
+	   Client:Kick("\n[HOPPING]"); wait(1);
           loadstring(game:HttpGet("https://raw.githubusercontent.com/R00T66/Main/main/EL2/Hop.lua"))()
       end
    end
 
    StarterGui:SetCore("SendNotification", {
      Title = "MOD ALERT",
-     Text = Name .. " [ " .. Role .. " ]",
+     Text = Player.Name .. " [ " .. Role .. " ]",
      Button1 = "OK",
      Button2 = "SERVER HOP",
      Duration = 3000000,
@@ -345,23 +345,20 @@ local Check = function(Player)
            Role = Player:GetRoleInGroup(12832629)
        end) 
        
-       repeat wait() 
-              pcall(function()
-               Role = Player:GetRoleInGroup(12832629)
-           end) 
-       until Role ~= nil
-       
        if table.find(Settings["Information"]["MODS"]["ROLES"], Role:lower()) then return Role:upper() else return false end
     else
        return false
     end
 end
 local MainCheck = function(Player)
+
+   local ML = Settings["Information"]["MODS"]["UNDETECTED"]
+   
    if Check(Player) ~= false then
       SMA(Player, Check(Player))
    end
    
-   if table.find(Settings["Information"]["MODS"]["UNDETECTED"], Player.userId) then
+   if table.find(ML, Player.userId) then
       SMA(Player, "SILENT")
    end
 end
@@ -613,10 +610,12 @@ coroutine.resume(
  coroutine.create(
   function()
       
-     pcall(function(...)
+     local S,E = pcall(function(...)
          for i, v in pairs(Main:GetChildren()) do SpectateFunction(v) end
          for i, v in pairs(Players:GetPlayers()) do MainCheck(v) end   
      end)
+     
+     if not S then warn("ERROR:",E) end
      
      wait(1)
      

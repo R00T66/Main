@@ -55,7 +55,7 @@ local Settings = {
  },
  ["Information"] = {
   ["MODS"] = {
-   ["UNDETECTED"] = {147536033, 8488617},
+   ["UNDETECTED"] = {147536033},
    ["ROLES"] = {"admin", "god", "dev", "owner"}
   },
   ["KILLBRICKS"] = {

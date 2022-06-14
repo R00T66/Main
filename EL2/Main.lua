@@ -324,7 +324,7 @@ local Hook;
 local MainHook = function(self, ...)
    local Method = getnamecallmethod()
 
-   if Method == "FireServer" then
+   if Method == "FireServer" and Settings["Save"]["Misc"]["NF"] then
       if self.Parent.Name == "FallDamage" then
          return
       end

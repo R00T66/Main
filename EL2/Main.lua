@@ -240,42 +240,6 @@ local MainService = function(...)
    if (Flying == true and Client.Character and Client.Character:FindFirstChild("Torso") and Client.Character:FindFirstChild("HumanoidRootPart")) then 
       UpdateFlight()
    end
-   
-   for i, v in pairs(TrinketFolder:GetChildren()) do
-     if (AutoPI or TriESP) then
-          
-      if (v:GetChildren()[1] ~= nil and v:GetChildren()[1]:FindFirstChild("ClickPart")) then
-            
-         local v = v:GetChildren()[1]:FindFirstChild("ClickPart"):WaitForChild("Clicker")
-         local TrinketPart = v.Parent
-         local TrinketName = TrinketPart.Parent.Name
-         local TrinketColor = Color3.fromRGB(TrnktT[1], TrnktT[2], TrnktT[3])
- 
-          
-         if AutoPI then
-            if Client.Character:FindFirstChild("HumanoidRootPart") then
-                  
-               local Root = Client.Character:FindFirstChild("HumanoidRootPart")
-
-               if (Root.Position - TrinketPart.Position).magnitude < 25 then
-                  fireclickdetector(v)
-               end
-            end
-         end
-
-         if not v:FindFirstChild("TrinketLol") and TriESP then            
-            Instance.new("BoolValue", v).Name = "TrinketLol"
-               
-            local Box = ESP:Add(TrinketPart, {
-              Name = TrinketName,
-              Color = TrinketColor
-            })
-
-            TrnktH[#TrnktH + 1] = Box
-         end
-      end
-   end
-end
 
       for i, v in pairs(EyeFolder:GetDescendants()) do
          if v:IsA("ClickDetector") and Settings["Save"]["ESP"]["Enabled_Eyes"] then

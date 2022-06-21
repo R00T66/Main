@@ -525,15 +525,14 @@ ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/R00T66/Main/mai
 ESP.Boxes = false
 ESP.Tracers = false
 ESP.Color = Color3.fromRGB(PlayerColor[1], PlayerColor[2], PlayerColor[3])
-
-ESP:Toggle(true)
+ESP:Toggle(Settings["Save"]["ESP"]["Enabled_Player"])
 
 local Library =
     loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
 local GUIPage = Library.new("META WARE [ EL2 ]", 5013109572)
 
 local MAIN = GUIPage:addPage("MAIN")
-local ESP = GUIPage:addPage("ESP")
+local ESPM = GUIPage:addPage("ESP")
 
 local MAIN_MOVEMENT = MAIN:addSection("MOVEMENT")
 local MAIN_MSETTINGS = MAIN:addSection("MOVEMENT SETTINGS")
@@ -541,8 +540,8 @@ local MAIN_MISC = MAIN:addSection("MISC")
 local MAIN_GENERAL_TABLE = Settings["General"]
 local MAIN_MISC_TABLE = Settings["Save"]["Misc"]
 
-local ESP_ENABLE = ESP:addSection("TOGGLE")
-local ESP_SETTINGS = ESP:addSection("SETTINGS")
+local ESP_ENABLE = ESPM:addSection("TOGGLE")
+local ESP_SETTINGS = ESPM:addSection("SETTINGS")
 local ESP_ENABLE_TABLE = Settings["Save"]["ESP"]
 local ESP_COLOR_TABLE = Settings["Save"]["ESP_Settings"]
 
@@ -639,6 +638,7 @@ ESP_ENABLE:addToggle(
     ESP_ENABLE_TABLE["Enabled_Player"],
     function(Value)
         ESP_ENABLE_TABLE["Enabled_Player"] = Value
+        ESP:Toggle(Value)
         Save_Settings()
     end
 )

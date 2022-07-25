@@ -625,6 +625,8 @@ if not SRE then
    CreateSuccess("MADE FOR SYNAPSE X, BE CAUTIOUS")  
 end
 if not AFK then
+   -- HACK INTO THE MAIN FRAME >:)))!!! THANKS FOR YOUR "IP ADDRESS". /Joke/Joke/Joke.
+   
    Player.Idled:connect(function(...)
        VirtualUser:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
        wait(1)

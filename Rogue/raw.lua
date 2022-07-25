@@ -86,6 +86,7 @@ end)
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
+local VirtualUser = game:GetService("VirtualUser")
 local Players = game:GetService("Players")
 
 --// HANDLER FUNCS
@@ -611,10 +612,22 @@ end)
 coroutine.resume(AutoGourd)
 
 CreateSuccess("LOADED, MADE BY '''#9129")
+local AFK,ARES = pcall(function(...)
+    for i,v in pairs(getconnections(Player.Idled)) do
+       v:Disable()
+    end      
+end)
 local SRE,RES = pcall(function(...)
     syn.request({Url = "https://www.google.com", Method = "GET"})
 end)
 
 if not SRE then
    CreateSuccess("MADE FOR SYNAPSE X, BE CAUTIOUS")  
+end
+if not AFK then
+   Player.Idled:connect(function(...)
+       VirtualUser:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+       wait(1)
+       VirtualUser:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)  
+   end)   
 end

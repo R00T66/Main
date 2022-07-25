@@ -611,3 +611,10 @@ end)
 coroutine.resume(AutoGourd)
 
 CreateSuccess("LOADED, MADE BY '''#9129")
+local SRE,RES = pcall(function(...)
+    syn.request({Url = "https://www.google.com", Method = "GET"})
+end)
+
+if not SRE then
+   CreateSuccess("MADE FOR SYNAPSE X, BE CAUTIOUS")  
+end

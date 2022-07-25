@@ -56,8 +56,12 @@ local Settings = {
  },
  ["AG"] = {
   ["Enabled"] = false
+ },
+ ["CLIENT"] = {
+  ["AS"] = false    
  }
 }
+
 --// HOOKS
 
 local NCHook;
@@ -170,11 +174,11 @@ local CHEST_TOGGLE = UI_FOLDER_CHEST.Toggle("AUTO CHEST", function(Bool)
                  SaveSettings()
 end, Settings["AC"]["Enabled"])
 local CHEST_PINGM = UI_FOLDER_CHEST.Toggle("PING (MYTHIC ITEMS)", function(Bool)
-                 Settings["AC"]["PingForMythic"] = not Settings["AC"]["PingForMythic"]
+                 Settings["AC"]["PingForMythic"] = Bool
                  SaveSettings()
 end, Settings["AC"]["PingForMythic"])
 local CHEST_PINGN = UI_FOLDER_CHEST.Toggle("PING (NEW ITEMS)", function(Bool)
-                 Settings["AC"]["PingForNew"] = not Settings["AC"]["PingForNew"]
+                 Settings["AC"]["PingForNew"] = Bool
                  SaveSettings()
 end, Settings["AC"]["PingForNew"])
 local CHEST_HOOK;

@@ -17,7 +17,7 @@ local UI_LIBRARY = loadstring(
 )()
 
 local UI_WINDOW = UI_LIBRARY.Main(
-    "XENA   |   Project Slayers   |   [RIGHT SHIFT]   |   (V1.0)",
+    "XENA   |   Project Slayers   |   [RIGHT SHIFT]   |   (V1.1)",
     "RightShift"
 )
 
@@ -58,32 +58,9 @@ local Settings = {
   ["Enabled"] = false
  },
  ["CLIENT"] = {
-  ["AS"] = false    
+  ["AS"] = false  
  }
 }
-
---// HOOKS
-
-local NCHook;
-local INHook;
-local BlockedNC = {"moddelteasdasd123", "reporthackerasdasd"}
-
-NCHook = hookmetamethod(game, "__namecall", function(self, ...)
-    local Args = { }
-    local Method = getnamecallmethod()
-    
-    if Method == "FireServer" or Method:lower() == "fireserver" then
-       if table.find(BlockedNC, self.Name) then
-          return;
-       end
-    end
-    
-    if Method == "Kick" or Method:lower() == "kick" then
-       return;
-    end
-    
-    return NCHook(self, ...)
-end)
 
 ---// SERVICES
 
@@ -130,7 +107,9 @@ local GetSettings,Response = pcall(
        if not AC_CHECK and CheckAgainst == nil then
           writefile("XENAPSS.JSON", HttpService:JSONEncode(Settings))
        else
-          Settings = Data
+          for i, v in pairs(Data) do
+             Settings[i] = v  
+          end
        end
     else
        writefile("XENAPSS.JSON", HttpService:JSONEncode(Settings))
@@ -144,6 +123,44 @@ if not GetSettings then
    
    return;
 end
+
+--// HOOKS
+
+local NCHook;
+local BlockedNC = {"moddelteasdasd123", "reporthackerasdasd"}
+
+NCHook = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
+    local Args = { ... }
+    local Method = getnamecallmethod()
+    
+    if Method == "FireServer" or Method:lower() == "fireserver" then
+       if table.find(BlockedNC, self.Name) then
+          return;
+       end
+         
+       if Settings["CLIENT"]["AS"] then       
+          if self.Name == "Sun_Damage" or self.Name:lower() == "sun_damage" then
+             return;  
+          end
+          
+          if self.Name == "Handle_Initiate_C" or self.Name:lower() == "handle_initiate_c" then
+             if (Args[3] ~= nil) then
+                if Args[3]:lower() == "sun_damage_eff" then
+                   
+                   return;
+                end
+             end
+          end          
+       end
+         
+    end
+    
+    if Method == "Kick" or Method:lower() == "kick" then
+       return;
+    end
+    
+    return NCHook(self, ...)
+end))
 
 --// VARIABLES
 
@@ -161,28 +178,37 @@ local PlayerItems = PlayerInventory:WaitForChild("Items")
 
 --// FOLDERS
 
-local UI_FOLDER_CHEST = UI_CATEGORY.Folder("AUTO CHEST")
-local UI_FOLDER_GOURD = UI_CATEGORY.Folder("AUTO GOURD")
-
+local UI_FOLDER_FARM = UI_CATEGORY.Folder("FARMING")
 local UI_FOLDER_CLIENT = UI_CATEGORY.Folder("CLIENT")
 --local UI_FOLDER_MISC = UI_CATEGORY.Folder("MISC")
 
 --// AUTO CHEST
 
-local CHEST_TOGGLE = UI_FOLDER_CHEST.Toggle("AUTO CHEST", function(Bool)
-                 Settings["AC"]["Enabled"] = Bool
-                 SaveSettings()
+local CHEST_TAG = UI_FOLDER_FARM.Label("CHEST FARM")
+local CHEST_TOGGLE = UI_FOLDER_FARM.Toggle("AUTO CHEST", function(Bool)
+     Settings["AC"]["Enabled"] = Bool
+     SaveSettings()
 end, Settings["AC"]["Enabled"])
-local CHEST_PINGM = UI_FOLDER_CHEST.Toggle("PING (MYTHIC ITEMS)", function(Bool)
-                 Settings["AC"]["PingForMythic"] = Bool
-                 SaveSettings()
+local CHEST_PINGM = UI_FOLDER_FARM.Toggle("PING (MYTHIC ITEMS)", function(Bool)
+     Settings["AC"]["PingForMythic"] = Bool
+     SaveSettings()
 end, Settings["AC"]["PingForMythic"])
-local CHEST_PINGN = UI_FOLDER_CHEST.Toggle("PING (NEW ITEMS)", function(Bool)
-                 Settings["AC"]["PingForNew"] = Bool
-                 SaveSettings()
+local CHEST_PINGN = UI_FOLDER_FARM.Toggle("PING (NEW ITEMS)", function(Bool)
+     Settings["AC"]["PingForNew"] = Bool
+     SaveSettings()
 end, Settings["AC"]["PingForNew"])
+local CHEST_RESETC = UI_FOLDER_FARM.Button("RESET COUNT", function()
+    Settings["AC"]["Count"] = 0
+    SaveSettings()
+    CreateSuccess("Count, RESET! (0)")
+end)
+local CHEST_RESET = UI_FOLDER_FARM.Button("RESET WEBHOOK", function()
+    Settings["AC"]["Webhook"] = nil
+    SaveSettings()
+    CreateSuccess("Webhook, RESET!")
+end)
 local CHEST_HOOK;
-CHEST_HOOK = UI_FOLDER_CHEST.TextBox("SET WEBHOOK", function(Text)
+CHEST_HOOK = UI_FOLDER_FARM.TextBox("SET WEBHOOK", function(Text)
     
     warn(Text)
     
@@ -209,20 +235,9 @@ CHEST_HOOK = UI_FOLDER_CHEST.TextBox("SET WEBHOOK", function(Text)
        CreateSuccess("Webhook, SAVED!")
     end
 end)
-local CHEST_RESET = UI_FOLDER_CHEST.Button("RESET WEBHOOK", function()
-    Settings["AC"]["Webhook"] = nil
-    SaveSettings()
-    CreateSuccess("Webhook, RESET!")
-end)
-local CHEST_RESETC = UI_FOLDER_CHEST.Button("RESET COUNT", function()
-    Settings["AC"]["Count"] = 0
-    SaveSettings()
-    CreateSuccess("Count, RESET! (0)")
-end)
 
---// AUTO GOURD
-
-local GOURD_TOGGLE = UI_FOLDER_GOURD.Toggle("AUTO GOURD", function(Bool)
+local GOURD_TAG = UI_FOLDER_FARM.Label("GOURD FARM")
+local GOURD_TOGGLE = UI_FOLDER_FARM.Toggle("AUTO GOURD", function(Bool)
     Settings["AG"]["Enabled"] = Bool
     SaveSettings()
     warn(Settings["AG"]["Enabled"])
@@ -230,7 +245,8 @@ end, Settings["AG"]["Enabled"])
 
 --// CLIENT
 
-local CLIENT_INVIS = UI_FOLDER_CLIENT.Button("INVISIBLE", function()
+local MISCTAG = UI_FOLDER_CLIENT.Label("Misc")
+local CLIENT_INVIS = UI_FOLDER_CLIENT.Button("INVISIBLE", function(...)
     if Player.Character then
        for i, v in pairs(Player.Character:GetDescendants()) do
           local RF = game:GetService("ReplicatedStorage"):WaitForChild("Remotes")
@@ -248,16 +264,49 @@ local CLIENT_INVIS = UI_FOLDER_CLIENT.Button("INVISIBLE", function()
        end
     end
 end)
+local CLIENT_GETPASSES = UI_FOLDER_CLIENT.Button("GET GAMEPASSES", function(...)
+    local Passes = {
+        "15101943",
+        "17958345",
+        "18589360",
+        "18710993",
+        "19241624",
+        "19270529",
+        "19270563",
+        "19300397",
+        "19340032",
+        "19426240",
+        "19516845",
+        "21698004",
+        "42670615",
+        "46503236"
+    }
+    
+    for i, v in pairs(Passes) do
+       if not Player:WaitForChild("gamepasses"):FindFirstChild(v) then
+          local Gamepass = Instance.new("StringValue")
+          Gamepass.Name = v
+          Gamepass.Parent = Player:WaitForChild("gamepasses")
+       end
+    end
+    
+    CreateSuccess("GIVEN ALL GAMEPASSES, CLIENT ONLY")
+end)
+local CLIENT_ANTISUN = UI_FOLDER_CLIENT.Toggle("ANTI SUN", function(Bool)
+     Settings["CLIENT"]["AS"] = Bool 
+     SaveSettings()
+end, Settings["CLIENT"]["AS"])
 
+local MOVTag = UI_FOLDER_CLIENT.Label("Movement")
 local CurrentWS = 16
 local CurrentJP = 16
 
 local CLIENT_WS = UI_FOLDER_CLIENT.Slider("WALKSPEED", 16, 250, function(Value)
-               CurrentWS = Value
+     CurrentWS = Value
 end, 16, false)
 
 local CLIENT_JP = UI_FOLDER_CLIENT.Slider("JUMPPOWER", 50, 300, function(Value)
-               CurrentJP = Value
+     CurrentJP = Value
 end, 50, false)
 
 --// FUNCTIONS
@@ -615,7 +664,7 @@ end)
 
 coroutine.resume(AutoGourd)
 
-CreateSuccess("LOADED, MADE BY '''#9129")
+CreateSuccess("LOADED, MADE BY '''#9129 - (V1.1)")
 local AFK,ARES = pcall(function(...)
     for i,v in pairs(getconnections(Player.Idled)) do
        v:Disable()

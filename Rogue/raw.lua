@@ -300,7 +300,7 @@ end, Settings["CLIENT"]["AS"])
 
 local MOVTag = UI_FOLDER_CLIENT.Label("Movement")
 local CurrentWS = 16
-local CurrentJP = 16
+local CurrentJP = 50
 
 local CLIENT_WS = UI_FOLDER_CLIENT.Slider("WALKSPEED", 16, 250, function(Value)
      CurrentWS = Value

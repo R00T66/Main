@@ -20,7 +20,7 @@ local ESP_LIBRARY = loadstring(
 )(); ESP_LIBRARY.Boxes = false;
 
 local UI_WINDOW = UI_LIBRARY.Main(
-    "XENA   |   Project Slayers   |   [RIGHT SHIFT]   |   (V1.1)",
+    "XENA   |   Project Slayers   |   [RIGHT SHIFT]   |   (V1.2)",
     "RightShift"
 )
 

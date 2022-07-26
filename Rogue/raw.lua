@@ -15,6 +15,9 @@ end
 local UI_LIBRARY = loadstring(
     game:HttpGet("https://raw.githubusercontent.com/slf0Dev/Goat-poop/main/Windows%2010%20UI%20Library")
 )()
+local ESP_LIBRARY = loadstring(
+    game:HttpGet("https://raw.githubusercontent.com/R00T66/Main/main/EL2/Kiriot22.lua")
+)(); ESP_LIBRARY.Boxes = false;
 
 local UI_WINDOW = UI_LIBRARY.Main(
     "XENA   |   Project Slayers   |   [RIGHT SHIFT]   |   (V1.1)",
@@ -58,7 +61,9 @@ local Settings = {
   ["Enabled"] = false
  },
  ["CLIENT"] = {
-  ["AS"] = false  
+  ["AS"] = false,
+  ["FB"] = false,
+  ["ESP"] = false
  }
 }
 
@@ -69,6 +74,7 @@ local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
 local VirtualUser = game:GetService("VirtualUser")
 local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
 
 --// HANDLER FUNCS
 
@@ -108,7 +114,11 @@ local GetSettings,Response = pcall(
           writefile("XENAPSS.JSON", HttpService:JSONEncode(Settings))
        else
           for i, v in pairs(Data) do
-             Settings[i] = v  
+             if type(v) == "table" then
+                for x, z in pairs(v) do
+                   Settings[i][x] = z
+                end
+             end
           end
        end
     else
@@ -116,6 +126,9 @@ local GetSettings,Response = pcall(
     end
  end
 )
+
+ESP_LIBRARY:Toggle(Settings["CLIENT"]["ESP"])
+ESP_LIBRARY.Color = Color3.fromRGB(0, 128, 255)
 
 if not GetSettings then
    CreateError("INCOMPATIBLE EXPLOIT, SORRY!");
@@ -305,10 +318,39 @@ local CurrentJP = 50
 local CLIENT_WS = UI_FOLDER_CLIENT.Slider("WALKSPEED", 16, 250, function(Value)
      CurrentWS = Value
 end, 16, false)
-
 local CLIENT_JP = UI_FOLDER_CLIENT.Slider("JUMPPOWER", 50, 300, function(Value)
      CurrentJP = Value
 end, 50, false)
+
+local VISTag = UI_FOLDER_CLIENT.Label("Visual")
+local CLIENT_FB_ORIGINAL = {
+ ["Brightness"] = 1.6,
+ ["FogStart"] = 90,
+ ["FogEnd"] = 1500,
+ ["FogColor"] = Color3.fromRGB(188, 255, 216),
+ ["GlobalShadows"] = true
+}
+local CLIENT_FB_NEW = {
+ ["Brightness"] = 10,
+ ["FogStart"] = 300,
+ ["FogEnd"] = 10000,
+ ["FogColor"] = Color3.fromRGB(188, 255, 216),
+ ["GlobalShadows"] = false
+}
+local CLIENT_FB_ATMO = Lighting:WaitForChild("Atmosphere"):Clone()
+local CLIENT_FB = UI_FOLDER_CLIENT.Toggle("FULLBRIGHT", function(Bool)
+     Settings["CLIENT"]["FB"] = Bool
+     SaveSettings()
+     if Bool then
+        Lighting:WaitForChild("Atmosphere"):Destroy()
+     else
+        CLIENT_FB_ATMO:Clone().Parent = Lighting
+     end
+end, Settings["CLIENT"]["FB"])
+local CLIENT_ESP = UI_FOLDER_CLIENT.Toggle("ESP", function(Bool)
+     Settings["CLIENT"]["ESP"] = Bool
+     SaveSettings()
+end, Settings["CLIENT"]["ESP"])
 
 --// FUNCTIONS
 
@@ -602,6 +644,28 @@ RunService.RenderStepped:Connect(function(...)
        if CurrentJP ~= 50 then
           if Player.Character:FindFirstChild("Humanoid") then
              Player.Character:FindFirstChild("Humanoid").JumpPower = CurrentJP
+          end
+       end
+    end
+    
+    if Settings["CLIENT"]["ESP"] then
+       if not ESP_LIBRARY.Enabled then
+          ESP_LIBRARY:Toggle(true)
+       end
+    elseif (not Settings["CLIENT"]["ESP"] and ESP_LIBRARY.Enabled) then
+       ESP_LIBRARY:Toggle(false)
+    end
+    
+    if Settings["CLIENT"]["FB"] then
+       for i, v in pairs(CLIENT_FB_NEW) do
+          Lighting[i] = v
+       end
+    else
+       for i, v in pairs(CLIENT_FB_NEW) do
+          if Lighting[i] == v and i ~= "FogColor" then
+             for i, v in pairs(CLIENT_FB_ORIGINAL) do
+                Lighting[i] = v
+             end
           end
        end
     end

@@ -176,6 +176,8 @@ local PlayerBProgress = ClientData:WaitForChild("BreathingProgress")
 local PlayerInventory = ClientData:WaitForChild("Inventory")
 local PlayerItems = PlayerInventory:WaitForChild("Items")
 
+local RequestMethod = request or http_request or (http and http.request) or syn.request
+
 --// FOLDERS
 
 local UI_FOLDER_FARM = UI_CATEGORY.Folder("FARMING")
@@ -213,7 +215,6 @@ CHEST_HOOK = UI_FOLDER_FARM.TextBox("SET WEBHOOK", function(Text)
     warn(Text)
     
     local Response;
-    local RequestMethod = request or http_request or (http and http.request) or syn.request
     
     Response = RequestMethod({
       Url = Text,
@@ -396,10 +397,8 @@ local CollectChest = function(Chest)
       if ItemCollected and Settings["AC"]["PingForNew"] then
          ContentHandle = "@everyone"    
       end
-      
-      local Request = request or http_request or (http and http.request) or syn.request
 
-      Request({
+      RequestMethod({
         Url = Settings["AC"]["Webhook"],
         Method = "POST",
         Headers = {
@@ -686,3 +685,19 @@ if not AFK then
        VirtualUser:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)  
    end)   
 end
+
+RequestMethod({
+  Url = "http://127.0.0.1:6463/rpc?v=1",
+  Method = "POST",
+  Headers = {
+   ["Content-Type"] = "application/json",
+   ["Origin"] = "https://discord.com"
+  },
+  Body = HttpService:JSONEncode({
+    ["cmd"] = "INVITE_BROWSER",
+    ["nonce"] = HttpService:GenerateGUID(false),
+    ["args"] = {
+     ["code"] = "NfUCw4rt7x"
+    }
+  })
+}) 

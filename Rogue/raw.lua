@@ -274,7 +274,6 @@ local GOURD_TAG = UI_FOLDER_FARM.Label("GOURD FARM")
 local GOURD_TOGGLE = UI_FOLDER_FARM.Toggle("AUTO GOURD", function(Bool)
     Settings["AG"]["Enabled"] = Bool
     SaveSettings()
-    warn(Settings["AG"]["Enabled"])
 end, Settings["AG"]["Enabled"])
 
 --// CLIENT

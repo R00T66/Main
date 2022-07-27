@@ -2,7 +2,7 @@
 
 repeat wait() until game.IsLoaded
 
-if game.PlaceId ~= 6152116144 then
+if game.PlaceId ~= 6152116144 and game.PlaceId ~= 7447158459 then
    game:GetService("StarterGui"):SetCore("SendNotification", {
      Title = "ERROR",
      Text = "INCORRECT GAME?",
@@ -246,8 +246,6 @@ local CHEST_RESET = UI_FOLDER_FARM.Button("RESET WEBHOOK", function()
 end)
 local CHEST_HOOK;
 CHEST_HOOK = UI_FOLDER_FARM.TextBox("SET WEBHOOK", function(Text)
-    
-    warn(Text)
     
     local Response;
     

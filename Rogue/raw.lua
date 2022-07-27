@@ -174,6 +174,28 @@ NCHook = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
     
     return NCHook(self, ...)
 end))
+local HookSun,ResponseSun = pcall(function()
+    for i,v in pairs(getrenv()._G) do
+        if i == "Initiate_C" then
+      
+            local Hook;
+
+            Hook = hookfunction(v, function(...)
+                local Args = { ... }
+                
+                if Args[2] == "SUN_Damage_EFF" and Settings["CLIENT"]["AS"] then
+                   return;
+                end
+                
+                return Hook(...)
+            end)
+        end
+    end
+end)
+
+if not HookSun then
+   CreateError("EXPLOIT DOESN'T SUPPORT GETRENV(), script will run anyway.")
+end
 
 --// VARIABLES
 
@@ -733,7 +755,7 @@ local AFK,ARES = pcall(function(...)
        v:Disable()
     end      
 end)
-local SRE,RES = pcall(function(...)
+local SRE,SRES = pcall(function(...)
     syn.request({Url = "https://www.google.com", Method = "GET"})
 end)
 

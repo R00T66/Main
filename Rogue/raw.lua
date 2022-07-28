@@ -1,6 +1,6 @@
 -- if you find this i don't care, its just because i hate the devs
 
-local Version = "1.5"
+local Version = "1.6"
 
 repeat wait() until game.IsLoaded
 
@@ -65,10 +65,15 @@ local Settings = {
  ["CLIENT"] = {
   ["AS"] = false,
   ["FB"] = false,
+  ["IB"] = false,
+  ["IS"] = false,
   ["ESP"] = false
  },
  ["TELEPORTS"] = {
   ["Method"] = "Normal"
+ },
+ ["FINAL"] = {
+  ["ESP"] = false
  }
 }
 
@@ -256,26 +261,58 @@ NCHook = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
     
     return NCHook(self, ...)
 end))
-local HookSun,ResponseSun = pcall(function()
+local HookGlobal,ResponseGlobal = pcall(function()
     for i,v in pairs(getrenv()._G) do
         if i == "Initiate_C" then
       
             local Hook;
 
-            Hook = hookfunction(v, function(...)
+            Hook = hookfunction(v, function(self, ...)
                 local Args = { ... }
                 
-                if Args[2] == "SUN_Damage_EFF" and Settings["CLIENT"]["AS"] then
+                if Args[1] == "SUN_Damage_EFF" and Settings["CLIENT"]["AS"] then
                    return;
                 end
                 
-                return Hook(...)
+                return Hook(self, ...)
             end)
+        end
+        
+        if i == "Stamina" then
+           local Hook;
+           
+           Hook = hookfunction(v, function(self, ...)
+               local Args = { ... }
+               
+               if typeof(Args[1]) == "number" and Settings["CLIENT"]["IS"] then
+                  Args[1] = 0
+                  
+                  return Hook(self, unpack(Args))
+               end
+               
+               return Hook(self, ...)
+           end)
+        end
+        
+        if i == "Breath" then
+           local Hook;
+           
+           Hook = hookfunction(v, function(self, ...)
+               local Args = { ... }
+               
+               if typeof(Args[1]) == "number" and Settings["CLIENT"]["IB"] then
+                  Args[1] = 0
+                  
+                  return Hook(self, unpack(Args))
+               end
+               
+               return Hook(self, ...)
+           end)
         end
     end
 end)
 
-if not HookSun then
+if not HookGlobal then
    CreateError("EXPLOIT DOESN'T SUPPORT GETRENV(), script will run anyway.")
 end
 
@@ -377,8 +414,88 @@ local UI_FOLDER_CLIENT = UI_CATEGORY.Folder("CLIENT")
 
 if game.PlaceId == 7447158459 then
    local UI_FOLDER_FINAL = UI_CATEGORY.Folder("FINAL SELECTION")
+   local FINAL_ESP = UI_FOLDER_FINAL.Toggle("ITEM ESP", function(Bool)
+      Settings["FINAL"]["ESP"] = Bool
+   end, Settings["FINAL"]["ESP"])
    
+   local ESPS = { }
+   local ESP_LIBRARY_FINAL = loadstring(
+      game:HttpGet("https://raw.githubusercontent.com/R00T66/Main/main/EL2/Kiriot22.lua")
+   )(); 
+   ESP_LIBRARY_FINAL.Boxes = false; 
+   ESP_LIBRARY_FINAL.Color = Color3.fromRGB(0, 128, 255);
    
+   game:GetService("RunService").RenderStepped:Connect(function(...)
+       
+       if not Settings["FINAL"]["ESP"] then 
+          
+          for i, v in pairs(ESPS) do
+             if v ~= nil then
+                v:Remove()
+                table.remove(ESPS, i)
+             end
+          end
+          
+          local FolderSignals = {
+           "Katana",
+           "AppleD",
+           "BananaD",
+           "StrawberryD"
+          }
+          
+          for i, v in pairs(Debree:GetDescendants()) do
+             if table.find(FolderSignals, v.Name) then v:Destroy() end
+          end
+          
+          ESP_LIBRARY_FINAL:Toggle(false)
+          
+          return 
+       end
+       
+       ESP_LIBRARY_FINAL:Toggle(true)
+       
+       for i, v in pairs(Debree:GetDescendants()) do
+          if v.Name == "Take_Beth_Swords" then
+             if not v:FindFirstChild("Katana") then
+                Instance.new("Folder", v).Name = "Katana"
+                local Box = ESP_LIBRARY_FINAL:Add(v.Parent, {
+                  Name = "Katana"
+                })
+                table.insert(ESPS, Box)
+             end
+          end
+          if v.Name == "Apple" then
+             if not v:FindFirstChild("AppleD") then
+                Instance.new("Folder", v).Name = "AppleD"
+                local Box = ESP_LIBRARY_FINAL:Add(v, {
+                  Name = "Apple",
+                  Color = Color3.fromRGB(255, 0, 0)
+                })       
+                table.insert(ESPS, Box)
+             end
+          end
+          if v.Name == "Banana" then
+             if not v:FindFirstChild("BananaD") then
+                Instance.new("Folder", v).Name = "BananaD"
+                local Box = ESP_LIBRARY_FINAL:Add(v, {
+                  Name = "Banana",
+                  Color = Color3.fromRGB(255, 255, 0)
+                })    
+                table.insert(ESPS, Box)
+             end
+          end
+          if v.Name == "Strawberry" then
+             if not v:FindFirstChild("StrawberryD") then
+                Instance.new("Folder", v).Name = "StrawberryD"
+                local Box = ESP_LIBRARY_FINAL:Add(v, {
+                  Name = "Strawberry",
+                  Color = Color3.fromRGB(255, 0, 0)
+                })
+                table.insert(ESPS, Box)
+             end
+          end
+       end
+   end)
 else
    local UI_FOLDER_TELEPORTS = UI_CATEGORY.Folder("TELEPORTS")
    
@@ -387,7 +504,6 @@ else
    
    for i, x in pairs(Teleports) do
       TELEPORTS_DROPDOWN_L.Choice(i, function()
-         warn(i)
          SelectedTeleport = i
       end, false)
    end
@@ -483,57 +599,22 @@ end, Settings["AG"]["Enabled"])
 
 --// CLIENT
 
-local MISCTAG = UI_FOLDER_CLIENT.Label("Misc")
-local CLIENT_INVIS = UI_FOLDER_CLIENT.Button("INVISIBLE", function(...)
-    if Player.Character then
-       for i, v in pairs(Player.Character:GetDescendants()) do
-          local RF = game:GetService("ReplicatedStorage"):WaitForChild("Remotes")
-          local TS = RF:WaitForChild("To_Server")
-          
-          TS:WaitForChild("Handle_Initiate_S"):FireServer(
-              "Change_Transparency",
-              {
-               {
-                [1] = v,
-                [2] = 1
-               }
-              }
-           )
-       end
-    end
-end)
-local CLIENT_GETPASSES = UI_FOLDER_CLIENT.Button("GET GAMEPASSES", function(...)
-    local Passes = {
-        "15101943",
-        "17958345",
-        "18589360",
-        "18710993",
-        "19241624",
-        "19270529",
-        "19270563",
-        "19300397",
-        "19340032",
-        "19426240",
-        "19516845",
-        "21698004",
-        "42670615",
-        "46503236"
-    }
-    
-    for i, v in pairs(Passes) do
-       if not Player:WaitForChild("gamepasses"):FindFirstChild(v) then
-          local Gamepass = Instance.new("StringValue")
-          Gamepass.Name = v
-          Gamepass.Parent = Player:WaitForChild("gamepasses")
-       end
-    end
-    
-    CreateSuccess("GIVEN ALL GAMEPASSES, CLIENT ONLY")
-end)
+local COMTAG = UI_FOLDER_CLIENT.Label("Combat")
+
 local CLIENT_ANTISUN = UI_FOLDER_CLIENT.Toggle("ANTI SUN", function(Bool)
      Settings["CLIENT"]["AS"] = Bool 
      SaveSettings()
 end, Settings["CLIENT"]["AS"])
+
+local CLIENT_INFSTAM = UI_FOLDER_CLIENT.Toggle("INFINITE STAMINA", function(Bool)
+     Settings["CLIENT"]["IS"] = Bool 
+     SaveSettings()
+end, Settings["CLIENT"]["IS"])
+
+local CLIENT_INFBREATH = UI_FOLDER_CLIENT.Toggle("INFINITE BREATH", function(Bool)
+     Settings["CLIENT"]["IB"] = Bool 
+     SaveSettings()
+end, Settings["CLIENT"]["IB"])
 
 local MOVTag = UI_FOLDER_CLIENT.Label("Movement")
 local CurrentWS = 16
@@ -575,6 +656,56 @@ local CLIENT_ESP = UI_FOLDER_CLIENT.Toggle("ESP", function(Bool)
      Settings["CLIENT"]["ESP"] = Bool
      SaveSettings()
 end, Settings["CLIENT"]["ESP"])
+
+local MISCTAG = UI_FOLDER_CLIENT.Label("Misc")
+
+local CLIENT_INVIS = UI_FOLDER_CLIENT.Button("INVISIBLE", function(...)
+    if Player.Character then
+       for i, v in pairs(Player.Character:GetDescendants()) do
+          local RF = game:GetService("ReplicatedStorage"):WaitForChild("Remotes")
+          local TS = RF:WaitForChild("To_Server")
+          
+          TS:WaitForChild("Handle_Initiate_S"):FireServer(
+              "Change_Transparency",
+              {
+               {
+                [1] = v,
+                [2] = 1
+               }
+              }
+           )
+       end
+    end
+end)
+
+local CLIENT_GETPASSES = UI_FOLDER_CLIENT.Button("GET GAMEPASSES", function(...)
+    local Passes = {
+        "15101943",
+        "17958345",
+        "18589360",
+        "18710993",
+        "19241624",
+        "19270529",
+        "19270563",
+        "19300397",
+        "19340032",
+        "19426240",
+        "19516845",
+        "21698004",
+        "42670615",
+        "46503236"
+    }
+    
+    for i, v in pairs(Passes) do
+       if not Player:WaitForChild("gamepasses"):FindFirstChild(v) then
+          local Gamepass = Instance.new("StringValue")
+          Gamepass.Name = v
+          Gamepass.Parent = Player:WaitForChild("gamepasses")
+       end
+    end
+    
+    CreateSuccess("GIVEN ALL GAMEPASSES, CLIENT ONLY")
+end)
 
 --// FUNCTIONS
 

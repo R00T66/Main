@@ -67,6 +67,74 @@ local Settings = {
  }
 }
 
+local Teleports = {
+ ["Kiribating Village"] = {
+     Position = CFrame.new(123.877998, 282.207642, -1624.75195, 0.999820411, 4.16962713e-08, 0.0189506207, -4.28440501e-08, 1, 6.01607439e-08, -0.0189506207, -6.09618667e-08, 0.999820411),
+     Playing = false,
+     Current = nil
+ },
+ ["Kabiwaru Village"] = {
+     Position = CFrame.new(1995.31104, 315.908813, -2971.81006, 0.999716341, 1.90288834e-08, -0.0238157064, -2.02716866e-08, 1, -5.1942763e-08, 0.0238157064, 5.24108152e-08, 0.999716341),
+     Playing = false,
+     Current = nil 
+ },
+ ["Ushumaru Village"] = {
+     Position = CFrame.new(4307.15381, 342.214478, -4256.16113, 0.957107544, 1.97568539e-09, -0.289732844, -2.11284878e-09, 1, -1.60623903e-10, 0.289732844, 7.65896013e-10, 0.957107544),
+     Playing = false,
+     Current = nil 
+ },
+ ["Butterfly Mansion"] = {
+     Position = CFrame.new(2990.1438, 316.000549, -3872.85864, -0.999811351, -4.68872097e-09, -0.0194238424, -4.60860061e-09, 1, -4.16958956e-09, 0.0194238424, -4.07928624e-09, -0.999811351),
+     Playing = false,
+     Current = nil
+ },
+ ["Final Selection"] = {
+     Position = CFrame.new(5161.06396, 365.874878, -2425.24414, 0.0206445958, -2.3372305e-08, -0.999786854, -7.51860512e-08, 1, -2.4929804e-08, 0.999786854, 7.56846887e-08, 0.0206445958),
+     Playing = false,
+     Current = nil
+ },
+ ["Dangerous Woods"] = {
+     Position = CFrame.new(4022.73193, 342.914246, -3956.33105, -0.931558847, 1.6238408e-08, -0.363590658, 1.59389693e-08, 1, 3.82385901e-09, 0.363590658, -2.23311059e-09, -0.931558847),
+     Playing = false,
+     Current = nil
+ },
+ ["Ouwbayashi Home"] = {
+     Position = CFrame.new(1582.92102, 315.908813, -4607.25879, 0.271734774, 4.14331183e-08, 0.962372184, -1.27321895e-08, 1, -3.94580617e-08, -0.962372184, -1.53097779e-09, 0.271734774),
+     Playing = false,
+     Current = nil
+ },
+ ["Zapiwara Mountain"] = {
+     Position = CFrame.new(-340.773285, 426.857788, -2394.69116, -0.999974966, 6.34594102e-08, -0.00707402267, 6.37504343e-08, 1, -4.09143155e-08, 0.00707402267, -4.13642667e-08, -0.999974966),
+     Playing = false,
+     Current = nil
+ },
+ ["Zapiwara Cave"] = {
+     Position = CFrame.new(28.51227, 275.869537, -2419.09985, 0.216436952, 2.82154158e-08, 0.976296604, -1.08528894e-07, 1, -4.84048801e-09, -0.976296604, -1.04908729e-07, 0.216436952),
+     Playing = false,
+     Current = nil
+ },
+ ["Wind Trainer"] = {
+     Position = CFrame.new(1800.71399, 334.338989, -3522.95337, -0.990997434, -2.0051802e-08, 0.133880824, -1.81391968e-08, 1, 1.55056057e-08, -0.133880824, 1.29375257e-08, -0.990997434),
+     Playing = false,
+     Current = nil 
+ },
+ ["Slasher Demon"] = {
+     Position = CFrame.new(1800.71399, 334.338989, -3522.95337, -0.990997434, -2.0051802e-08, 0.133880824, -1.81391968e-08, 1, 1.55056057e-08, -0.133880824, 1.29375257e-08, -0.990997434),
+     Playing = false,
+     Current = nil 
+ },
+ ["Abubu Cave"] = {
+     Position = CFrame.new(1074, 276.115601, -3553.104, -0.994289756, 0, -0.106713973, 0, 1, 0, 0.106713973, 0, -0.994289756),
+     Playing = false,
+     Current = nil 
+ },
+ ["Waroru Cave"] = {
+     Position = CFrame.new(603.616028, 278.168274, -2562.02295, -0.397938579, -5.76645789e-08, 0.917412043, 9.47733669e-10, 1, 6.32667962e-08, -0.917412043, 2.60457611e-08, -0.397938579),
+     Playing = false,
+     Current = nil 
+ }
+}
+
 ---// SERVICES
 
 local HttpService = game:GetService("HttpService")
@@ -75,6 +143,7 @@ local StarterGui = game:GetService("StarterGui")
 local VirtualUser = game:GetService("VirtualUser")
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
 
 --// HANDLER FUNCS
 
@@ -213,11 +282,102 @@ local PlayerItems = PlayerInventory:WaitForChild("Items")
 
 local RequestMethod = request or http_request or (http and http.request) or syn.request
 
+local Tweening = false
+local CheckingTeleportStatus = false
+local SelectedTeleport = nil
+
+--// TELEPORTS
+
+local TeleportTo = function(String)
+   if Teleports[String] and not CheckingTeleportStatus then
+      CheckingTeleportStatus = true
+      
+      if Tweening then
+         Tweening = false
+      end
+      
+      for i, x in pairs(Teleports) do
+         if x.Playing then
+            if i ~= String then
+               if Current ~= nil then
+                  Current:Cancel();
+                  Current = nil
+                  x.Playing = false
+               end
+            end
+         end
+      end
+      
+      local function GetDistanceOfCFrames(cf,cf2)
+         local axis,theta = cf:ToAxisAngle()
+         local axis2,theta2 = cf2:ToAxisAngle()
+         
+         return (cf.Position-cf2.Position).Magnitude,((axis*theta)-(axis2*theta2)).Magnitude
+      end
+
+      if Player.Character then
+         if Player.Character:FindFirstChild("HumanoidRootPart") then
+            
+            local ToTween = Player.Character:FindFirstChild("HumanoidRootPart")
+            local Speed = GetDistanceOfCFrames(ToTween.CFrame, Teleports[String].Position) / 150
+            
+            Teleports[String].Playing = true
+            Teleports[String].Current = TweenService:Create(
+             ToTween,
+             TweenInfo.new(
+              Speed,
+              Enum.EasingStyle.Quad,
+              Enum.EasingDirection.In,
+              0,
+              false,
+              0
+             ),
+             {
+              CFrame = Teleports[String].Position
+             }
+            )
+            Tweening = true
+            Teleports[String].Current.Completed:Connect(function(...)
+                Tweening = false
+            end)
+            Teleports[String].Current:Play()
+         end
+      end
+      CheckingTeleportStatus = false
+   end
+end
+
 --// FOLDERS
 
 local UI_FOLDER_FARM = UI_CATEGORY.Folder("FARMING")
 local UI_FOLDER_CLIENT = UI_CATEGORY.Folder("CLIENT")
---local UI_FOLDER_MISC = UI_CATEGORY.Folder("MISC")
+
+if game.PlaceId == 7447158459 then
+   local UI_FOLDER_FINAL = UI_CATEGORY.Folder("FINAL SELECTION")
+   
+   
+else
+   local UI_FOLDER_TELEPORTS = UI_CATEGORY.Folder("TELEPORTS")
+   local TELEPORTS_LABEL_L = UI_FOLDER_TELEPORTS.Label("LOCATIONS")
+   local TELEPORTS_DROPDOWN_L = UI_FOLDER_TELEPORTS.Dropdown("LOCATIONS", false)
+   
+   local TELEPORTS_BUTTON = UI_FOLDER_TELEPORTS.Button("TELEPORT", function()
+       if SelectedTeleport == nil then
+          CreateError("SELECT A LOCATION!")
+       else
+          TeleportTo(SelectedTeleport)
+       end
+   end)
+   
+   for i, x in pairs(Teleports) do
+      TELEPORTS_DROPDOWN_L.Choice(i, function()
+         warn(i)
+         SelectedTeleport = i
+      end, false)
+   end
+   
+   
+end
 
 --// AUTO CHEST
 
@@ -653,6 +813,17 @@ RunService.RenderStepped:Connect(function(...)
     end
 end)
 
+RunService.Stepped:Connect(function(...)
+    if Tweening then
+       if Player.Character then
+          for i, x in pairs(Player.Character:GetDescendants()) do
+             if (x:IsA("BasePart")) then
+                x.CanCollide = false
+             end
+          end
+       end
+    end
+end)
 RunService.RenderStepped:Connect(function(...)
     if Player.Character then
        if CurrentWS ~= 16 then

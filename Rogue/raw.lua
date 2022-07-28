@@ -1,5 +1,7 @@
 -- if you find this i don't care, its just because i hate the devs
 
+local Version = "1.5"
+
 repeat wait() until game.IsLoaded
 
 if game.PlaceId ~= 6152116144 and game.PlaceId ~= 7447158459 then
@@ -20,7 +22,7 @@ local ESP_LIBRARY = loadstring(
 )(); ESP_LIBRARY.Boxes = false;
 
 local UI_WINDOW = UI_LIBRARY.Main(
-    "XENA   |   Project Slayers   |   [RIGHT SHIFT]   |   (V1.4)",
+    "XENA   |   Project Slayers   |   [RIGHT SHIFT]   |   (v" .. Version .. ")",
     "RightShift"
 )
 
@@ -64,6 +66,9 @@ local Settings = {
   ["AS"] = false,
   ["FB"] = false,
   ["ESP"] = false
+ },
+ ["TELEPORTS"] = {
+  ["Method"] = "Normal"
  }
 }
 
@@ -158,6 +163,14 @@ end
 local CreateSuccess = function(MSG)
    StarterGui:SetCore("SendNotification", {
      Title = "SUCCESS",
+     Text = MSG,
+     Duration = 10
+   })
+end
+
+local CreateWarn = function(MSG)
+   StarterGui:SetCore("SendNotification", {
+     Title = "WARNING",
      Text = MSG,
      Duration = 10
    })
@@ -318,8 +331,18 @@ local TeleportTo = function(String)
       if Player.Character then
          if Player.Character:FindFirstChild("HumanoidRootPart") then
             
+            local NUM;
+            
+            if Settings["TELEPORTS"]["Method"] == "Normal" then
+               NUM = 150
+            elseif Settings["TELEPORTS"]["Method"] == "Fast" then
+               NUM = 200
+            elseif Settings["TELEPORTS"]["Method"] == "Very Fast" then
+               NUM = 250
+            end
+            
             local ToTween = Player.Character:FindFirstChild("HumanoidRootPart")
-            local Speed = GetDistanceOfCFrames(ToTween.CFrame, Teleports[String].Position) / 150
+            local Speed = GetDistanceOfCFrames(ToTween.CFrame, Teleports[String].Position) / 250
             
             Teleports[String].Playing = true
             Teleports[String].Current = TweenService:Create(
@@ -358,8 +381,37 @@ if game.PlaceId == 7447158459 then
    
 else
    local UI_FOLDER_TELEPORTS = UI_CATEGORY.Folder("TELEPORTS")
+   
    local TELEPORTS_LABEL_L = UI_FOLDER_TELEPORTS.Label("LOCATIONS")
    local TELEPORTS_DROPDOWN_L = UI_FOLDER_TELEPORTS.Dropdown("LOCATIONS", false)
+   
+   for i, x in pairs(Teleports) do
+      TELEPORTS_DROPDOWN_L.Choice(i, function()
+         warn(i)
+         SelectedTeleport = i
+      end, false)
+   end
+   
+   local TELEPORTS_LABEL_M = UI_FOLDER_TELEPORTS.Label("MAIN")
+   local TELEPORTS_METHOD,METHOD_TXT = UI_FOLDER_TELEPORTS.Dropdown("METHOD", false);
+   
+   TELEPORTS_METHOD.Choice("Normal", function(...)
+      Settings["TELEPORTS"]["Method"] = "Normal"
+      SaveSettings()
+   end, false)
+   
+   TELEPORTS_METHOD.Choice("Fast", function(...)
+      Settings["TELEPORTS"]["Method"] = "Fast"
+      SaveSettings()
+   end, false)
+   
+   TELEPORTS_METHOD.Choice("Very Fast", function(...)
+      Settings["TELEPORTS"]["Method"] = "Very Fast"
+      SaveSettings()
+      CreateWarn("THIS METHOD IS RISKY, BEWARE")
+   end, false)
+   
+   METHOD_TXT.Text = Settings["TELEPORTS"]["Method"]
    
    local TELEPORTS_BUTTON = UI_FOLDER_TELEPORTS.Button("TELEPORT", function()
        if SelectedTeleport == nil then
@@ -368,13 +420,6 @@ else
           TeleportTo(SelectedTeleport)
        end
    end)
-   
-   for i, x in pairs(Teleports) do
-      TELEPORTS_DROPDOWN_L.Choice(i, function()
-         warn(i)
-         SelectedTeleport = i
-      end, false)
-   end
    
    
 end
@@ -917,7 +962,7 @@ end)
 
 coroutine.resume(AutoGourd)
 
-CreateSuccess("LOADED, MADE BY '''#9129 - (V1.1)")
+CreateSuccess("LOADED, MADE BY '''#9129 - (V" .. Version .. ")")
 local AFK,ARES = pcall(function(...)
     for i,v in pairs(getconnections(Player.Idled)) do
        v:Disable()
